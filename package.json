@@ -1,0 +1,45 @@
+{
+  "name": "n-defensive",
+  "version": "1.0.0",
+  "description": "Defensive programming library",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "ts-build": "tsc -p .",
+    "ts-build-watch": "npm run ts-build -- -w",
+    "ts-build-dist": "tsc -p ./dist",
+    "x-ts-build-watch": "watch 'npm run build' ./src --wait 1 --interval 1",
+    "pretest": "npm run ts-build",
+    "test": "mocha --reporter spec --ui tdd --require ts-node/register './test/**/*.test.js'",
+    "publish": "npm run ts-build-dist && git add . && git commit -m 'publishing new version' && git push"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nivinjoseph/n-defensive.git"
+  },
+  "keywords": [
+    "defensive",
+    "programming"
+  ],
+  "author": "NiviN",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nivinjoseph/n-defensive/issues"
+  },
+  "homepage": "https://github.com/nivinjoseph/n-defensive#readme",
+  "devDependencies": {
+    "@types/mocha": "^2.2.39",
+    "@types/node": "^7.0.5",
+    "@types/sinon": "^1.16.35",
+    "mocha": "^3.2.0",
+    "nsp": "^2.6.2",
+    "sinon": "^2.0.0-pre.6",
+    "ts-node": "^2.1.0",
+    "tslint": "^4.5.1",
+    "typescript": "2.2.1",
+    "watch": "^1.0.2"
+  },
+  "dependencies": {
+    "n-exception": "git+https://github.com/nivinjoseph/n-exception.git"
+  }
+}
