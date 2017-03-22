@@ -1,6 +1,6 @@
 {
   "name": "n-defensive",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "description": "Defensive programming library",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -11,7 +11,9 @@
     "x-ts-build-watch": "watch 'npm run build' ./src --wait 1 --interval 1",
     "pretest": "npm run ts-build",
     "test": "mocha --reporter spec --ui tdd --require ts-node/register './test/**/*.test.js'",
-    "publish": "npm run ts-build-dist && git add . && git commit -m 'publishing new version' && git push"
+    "prepublish": "npm run ts-build-dist && git add . && git commit -m 'preparing to publish new version'",
+    "publish": " npm version patch",
+    "postpublish": "git push"
   },
   "repository": {
     "type": "git",
