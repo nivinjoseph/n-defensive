@@ -8,6 +8,6 @@ suite("replace me with something", () =>
     {
         let val = "cc";
         
-        given(val, "val").ensureHasValue().ensure(t => !t.isEmptyOrWhiteSpace());
+        //given(val, "val").ensureHasValue().ensure(t => !t.isEmptyOrWhiteSpace());
     });
 });
