@@ -12,7 +12,7 @@
     "pretest": "npm run ts-build",
     "test": "mocha --reporter spec --ui tdd --require ts-node/register './test/**/*.test.js'",
     "prepublish": "npm run ts-build-dist && git add . && git commit -m 'preparing to publish new version'",
-    "publish": " npm version patch",
+    "publish": "npm version patch",
     "postpublish": "git push"
   },
   "repository": {
