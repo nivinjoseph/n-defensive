@@ -1,10 +1,9 @@
+import "n-ext";
 import  
 {
-    ApplicationException,
     ArgumentException,
     ArgumentNullException,
     InvalidArgumentException,
-    InvalidOperationException
 } from "n-exception";
 
 export interface Ensurer<T>
@@ -16,6 +15,9 @@ export interface Ensurer<T>
 
 export default function given<T>(arg: T, argName: string): Ensurer<T>
 {
+    if (argName == null || argName.isEmptyOrWhiteSpace())
+        throw new ArgumentNullException("argName");
+    
     return new EnsurerInternal(arg, argName);
 }
 
@@ -39,13 +41,16 @@ class EnsurerInternal<T> implements Ensurer<T>
         return this;
     }
 
-    public ensure(func: (arg: T) => boolean): Ensurer<T>;
+    public ensure(func: (arg: T) => boolean): Ensurer<T>;   
     public ensure(func: (arg: T) => boolean, reason: string): Ensurer<T>;
     public ensure(func: (arg: T) => boolean, reason?: string): Ensurer<T>
     {
+        if (func == null)
+            throw new ArgumentNullException("func");    
+        
         if (!func(this._arg))
         {
-            if (reason != null && reason.trim().length > 0)
+            if (reason != null && !reason.isEmptyOrWhiteSpace())
                 throw new ArgumentException(this._argName, reason.trim());
 
             throw new InvalidArgumentException(this._argName);
