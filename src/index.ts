@@ -13,7 +13,7 @@ export interface Ensurer<T>
     ensure(func: (arg: T) => boolean, reason: string): Ensurer<T>;
 }  
 
-export default function given<T>(arg: T, argName: string): Ensurer<T>
+export function given<T>(arg: T, argName: string): Ensurer<T>
 {
     if (argName == null || argName.isEmptyOrWhiteSpace())
         throw new ArgumentNullException("argName");
