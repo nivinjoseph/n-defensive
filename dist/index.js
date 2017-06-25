@@ -14,12 +14,63 @@ class EnsurerInternal {
         this._argName = argName;
     }
     ensureHasValue() {
-        if (this._arg == null || this._arg === undefined)
+        if (this._arg === null || this._arg === undefined)
             throw new n_exception_1.ArgumentNullException(this._argName);
         return this;
     }
+    ensureIsString() {
+        if (this._arg === null || this._arg === undefined)
+            return this;
+        if (typeof (this._arg) !== "string")
+            throw new n_exception_1.ArgumentException(this._argName, "must be string");
+        return this;
+    }
+    ensureIsNumber() {
+        if (this._arg === null || this._arg === undefined)
+            return this;
+        if (typeof (this._arg) !== "number")
+            throw new n_exception_1.ArgumentException(this._argName, "must be number");
+        return this;
+    }
+    ensureIsBoolean() {
+        if (this._arg === null || this._arg === undefined)
+            return this;
+        if (typeof (this._arg) !== "boolean")
+            throw new n_exception_1.ArgumentException(this._argName, "must be boolean");
+        return this;
+    }
+    ensureIsObject() {
+        if (this._arg === null || this._arg === undefined)
+            return this;
+        if (typeof (this._arg) !== "object")
+            throw new n_exception_1.ArgumentException(this._argName, "must be object");
+        return this;
+    }
+    ensureIsFunction() {
+        if (this._arg === null || this._arg === undefined)
+            return this;
+        if (typeof (this._arg) !== "function")
+            throw new n_exception_1.ArgumentException(this._argName, "must be function");
+        return this;
+    }
+    ensureIsArray() {
+        if (this._arg === null || this._arg === undefined)
+            return this;
+        if (!Array.isArray(this._arg))
+            throw new n_exception_1.ArgumentException(this._argName, "must be array");
+        return this;
+    }
+    ensureIsType(type) {
+        if (type === null || type === undefined)
+            throw new n_exception_1.ArgumentNullException("type");
+        if (this._arg == null || this._arg === undefined)
+            return this;
+        if (!(this._arg instanceof type))
+            throw new n_exception_1.ArgumentException(this._argName, `must be ${type.getTypeName()}`);
+        return this;
+    }
     ensure(func, reason) {
-        if (func == null)
+        if (func === null || func === undefined)
             throw new n_exception_1.ArgumentNullException("func");
         if (!func(this._arg)) {
             if (reason != null && !reason.isEmptyOrWhiteSpace())

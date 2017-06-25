@@ -150,6 +150,178 @@ suite("Exceptions thrown", () =>
         });
     });
     
+    suite("ensureIsString", () =>
+    {
+        test("should be fine if the value is string", () =>
+        {
+            let value = "foo";
+            given(value, "value").ensureIsString();
+            assert.ok(true);
+        });
+        
+        test("should throw ArgumentException if the value is not string", () =>
+        {
+            try 
+            {
+                let value = {};
+                given(value, "value").ensureIsString();
+                assert.ok(false);
+            }
+            catch (error)
+            {
+                assert.ok(error instanceof ArgumentException);
+            }
+        });
+    });
+    
+    suite("ensureIsNumber", () =>
+    {
+        test("should be fine if the value is number", () =>
+        {
+            let value = 55;
+            given(value, "value").ensureIsNumber();
+            assert.ok(true);
+        });
+
+        test("should throw ArgumentException if the value is not number", () =>
+        {
+            try 
+            {
+                let value = "5";
+                given(value, "value").ensureIsNumber();
+                assert.ok(false);
+            }
+            catch (error)
+            {
+                assert.ok(error instanceof ArgumentException);
+            }
+        });
+    });
+    
+    suite("ensureIsBoolean", () =>
+    {
+        test("should be fine if the value is boolean", () =>
+        {
+            let value = false;
+            given(value, "value").ensureIsBoolean();
+            assert.ok(true);
+        });
+
+        test("should throw ArgumentException if the value is not boolean", () =>
+        {
+            try 
+            {
+                let value = "true";
+                given(value, "value").ensureIsBoolean();
+                assert.ok(false);
+            }
+            catch (error)
+            {
+                assert.ok(error instanceof ArgumentException);
+            }
+        });
+    });
+    
+    suite("ensureIsObject", () =>
+    {
+        test("should be fine if the value is object", () =>
+        {
+            let value = {};
+            given(value, "value").ensureIsObject();
+            assert.ok(true);
+        });
+
+        test("should throw ArgumentException if the value is not object", () =>
+        {
+            try 
+            {
+                let value = "foo";
+                given(value, "value").ensureIsObject();
+                assert.ok(false);
+            }
+            catch (error)
+            {
+                assert.ok(error instanceof ArgumentException);
+            }
+        });
+    });
+    
+    suite("ensureIsFunction", () =>
+    {
+        test("should be fine if the value is function", () =>
+        {
+            let value = () => "foo";
+            given(value, "value").ensureIsFunction();
+            assert.ok(true);
+        });
+
+        test("should throw ArgumentException if the value is not function", () =>
+        {
+            try 
+            {
+                let value = {};
+                given(value, "value").ensureIsFunction();
+                assert.ok(false);
+            }
+            catch (error)
+            {
+                assert.ok(error instanceof ArgumentException);
+            }
+        });
+    });
+    
+    suite("ensureIsArray", () =>
+    {
+        test("should be fine if the value is array", () =>
+        {
+            let value = ["foo"];
+            given(value, "value").ensureIsArray();
+            assert.ok(true);
+        });
+
+        test("should throw ArgumentException if the value is not array", () =>
+        {
+            try 
+            {
+                let value = {};
+                given(value, "value").ensureIsArray();
+                assert.ok(false);
+            }
+            catch (error)
+            {
+                assert.ok(error instanceof ArgumentException);
+            }
+        });
+    });
+    
+    suite("ensureIsType", () =>
+    {
+        class Foo { }
+        class Bar { }
+        
+        
+        test("should be fine if the value is of correct type", () =>
+        {
+            let value = new Foo();
+            given(value, "value").ensureIsType(Foo);
+            assert.ok(true);
+        });
+
+        test("should throw ArgumentException if the value is not string", () =>
+        {
+            try 
+            {
+                let value = new Bar();
+                given(value, "value").ensureIsType(Foo);
+                assert.ok(false);
+            }
+            catch (error)
+            {
+                assert.ok(error instanceof ArgumentException);
+            }
+        });
+    });
+    
     suite("ensure", () =>
     {
         setup(() =>
