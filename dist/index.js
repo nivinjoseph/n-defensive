@@ -72,6 +72,8 @@ class EnsurerInternal {
     ensure(func, reason) {
         if (func === null || func === undefined)
             throw new n_exception_1.ArgumentNullException("func");
+        if (this._arg == null || this._arg === undefined)
+            return this;
         if (!func(this._arg)) {
             if (reason != null && !reason.isEmptyOrWhiteSpace())
                 throw new n_exception_1.ArgumentException(this._argName, reason.trim());

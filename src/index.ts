@@ -135,6 +135,9 @@ class EnsurerInternal<T> implements Ensurer<T>
         if (func === null || func === undefined)
             throw new ArgumentNullException("func");    
         
+        if (this._arg == null || this._arg === undefined)
+            return this;
+        
         if (!func(this._arg))
         {
             if (reason != null && !reason.isEmptyOrWhiteSpace())
