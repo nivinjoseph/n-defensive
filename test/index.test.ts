@@ -322,6 +322,22 @@ suite("Exceptions thrown", () =>
         });
     });
     
+    // suite("ensureHasStructure", () =>
+    // {
+    //     let obj = {
+    //         strval: "foo",
+    //         invalstrval: true,
+    //         numval: 5,
+    //         invalnumval: "7",
+    //         boolval: false,
+    //         invalboolval: "true",
+    //         objval: {
+    //             neststrval: "bar",
+                
+    //         }
+    //     }
+    // });
+    
     suite("ensure", () =>
     {
         setup(() =>

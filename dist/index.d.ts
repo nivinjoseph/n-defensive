@@ -8,6 +8,7 @@ export interface Ensurer<T> {
     ensureIsFunction(): Ensurer<T>;
     ensureIsArray(): Ensurer<T>;
     ensureIsType(type: Function): Ensurer<T>;
+    ensureHasStructure(structure: object): Ensurer<T>;
     ensure(func: (arg: T) => boolean): Ensurer<T>;
     ensure(func: (arg: T) => boolean, reason: string): Ensurer<T>;
 }

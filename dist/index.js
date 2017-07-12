@@ -69,6 +69,37 @@ class EnsurerInternal {
             throw new n_exception_1.ArgumentException(this._argName, `must be ${type.getTypeName()}`);
         return this;
     }
+    ensureHasStructure(structure) {
+        if (structure === null || structure === undefined)
+            throw new n_exception_1.ArgumentNullException("structure");
+        if (this._arg == null || this._arg === undefined)
+            return this;
+        this.ensureHasStructureInternal(this._arg, structure);
+        return this;
+    }
+    ensureHasStructureInternal(arg, schema) {
+        let types = ["string", "boolean", "number", "object"];
+        for (let key in schema) {
+            let isOptional = key.endsWith("?");
+            let type = schema[key];
+            type = typeof (type) === "string" ? type : "object";
+            if (types.every(t => t !== type))
+                throw new n_exception_1.ArgumentException("structure", `invalid type specification '${type}'`);
+            let value = arg[key];
+            if (value === null || value === undefined) {
+                if (isOptional)
+                    continue;
+                throw new n_exception_1.ArgumentException(this._argName, `is missing required property '${key}' of type '${type}'`);
+            }
+            if (type === "object") {
+                this.ensureHasStructureInternal(value, schema[key]);
+            }
+            else {
+                if (typeof (value) !== type)
+                    throw new n_exception_1.ArgumentException(this._argName, `invalid value of type '${typeof (value)}' for property '${key}' of type '${type}'`);
+            }
+        }
+    }
     ensure(func, reason) {
         if (func === null || func === undefined)
             throw new n_exception_1.ArgumentNullException("func");

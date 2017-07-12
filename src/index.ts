@@ -16,6 +16,7 @@ export interface Ensurer<T>
     ensureIsFunction(): Ensurer<T>;
     ensureIsArray(): Ensurer<T>;
     ensureIsType(type: Function): Ensurer<T>;
+    ensureHasStructure(structure: object): Ensurer<T>;
     ensure(func: (arg: T) => boolean): Ensurer<T>;
     ensure(func: (arg: T) => boolean, reason: string): Ensurer<T>;
 }  
@@ -126,6 +127,53 @@ class EnsurerInternal<T> implements Ensurer<T>
             throw new ArgumentException(this._argName, `must be ${(<Object>type).getTypeName()}`);
         
         return this;
+    }
+    
+    public ensureHasStructure(structure: object): Ensurer<T>
+    {
+        if (structure === null || structure === undefined)
+            throw new ArgumentNullException("structure");
+        
+        if (this._arg == null || this._arg === undefined)
+            return this;
+        
+        this.ensureHasStructureInternal(this._arg, structure);
+           
+        return this;
+    }
+    
+    private ensureHasStructureInternal(arg: any, schema: any)
+    {
+        let types = ["string", "boolean", "number", "object"];
+        
+        for (let key in schema)
+        {
+            let isOptional = key.endsWith("?");
+            let type = schema[key];
+            type = typeof (type) === "string" ? type : "object";
+            if (types.every(t => t !== type))
+                throw new ArgumentException("structure", `invalid type specification '${type}'`);    
+            
+            let value = arg[key];
+            if (value === null || value === undefined)
+            {
+                if (isOptional)
+                    continue;
+
+                throw new ArgumentException(this._argName, `is missing required property '${key}' of type '${type}'`);
+            }
+            
+            if (type === "object")
+            {
+                this.ensureHasStructureInternal(value, schema[key]);
+            }   
+            else
+            {
+                if (typeof (value) !== type)
+                    throw new ArgumentException(this._argName,
+                        `invalid value of type '${typeof (value)}' for property '${key}' of type '${type}'`);    
+            } 
+        } 
     }
 
     public ensure(func: (arg: T) => boolean): Ensurer<T>;   
