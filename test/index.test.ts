@@ -9,8 +9,8 @@ suite("Exceptions thrown", () =>
     let argName: any;
     let exceptionHappened: boolean;
     let exceptionType: string;
-    let reason: any;  
-    
+    let reason: any;
+
     setup(() =>
     {
         arg = null;
@@ -18,11 +18,11 @@ suite("Exceptions thrown", () =>
         exceptionHappened = false;
         reason = null;
     });
-    
+
     suite("given", () =>
-    {               
+    {
         test("should throw an ArgumentNullException if argName (second arg) is null", () => 
-        {      
+        {
             try 
             {
                 given(arg, argName);
@@ -35,7 +35,7 @@ suite("Exceptions thrown", () =>
             assert.strictEqual(exceptionHappened, true);
             assert.strictEqual(exceptionType, "ArgumentNullException");
         });
-        
+
         test("should throw an ArgumentNullException if argName (second arg) is undefined", () =>
         {
             argName = undefined;
@@ -51,7 +51,7 @@ suite("Exceptions thrown", () =>
             assert.strictEqual(exceptionHappened, true);
             assert.strictEqual(exceptionType, "ArgumentNullException");
         });
-        
+
         test("should throw an ArgumentNullException if argName (second arg) is an empty string", () =>
         {
             argName = "";
@@ -67,7 +67,7 @@ suite("Exceptions thrown", () =>
             assert.strictEqual(exceptionHappened, true);
             assert.strictEqual(exceptionType, "ArgumentNullException");
         });
-        
+
         test("should throw an ArgumentNullException if argName (second arg) is an whitespace string", () =>
         {
             argName = "  ";
@@ -83,7 +83,7 @@ suite("Exceptions thrown", () =>
             assert.strictEqual(exceptionHappened, true);
             assert.strictEqual(exceptionType, "ArgumentNullException");
         });
-        
+
         test("given should return an Ensurer object", () =>
         {
             let ensurer = given({}, "argName");
@@ -99,11 +99,11 @@ suite("Exceptions thrown", () =>
             assert.ok(ensurer != null);
         });
     });
-    
+
     suite("ensureHasValue", () =>     
-    {        
+    {
         test("should throw ArgumentNullException if arg is null", () =>
-        {          
+        {
             try 
             {
                 given(arg, argName).ensureHasValue();
@@ -112,11 +112,11 @@ suite("Exceptions thrown", () =>
             {
                 exceptionHappened = true;
                 exceptionType = (<Object>exp).getTypeName();
-            }             
+            }
             assert.strictEqual(exceptionHappened, true);
-            assert.strictEqual(exceptionType, "ArgumentNullException");            
-        }); 
-        
+            assert.strictEqual(exceptionType, "ArgumentNullException");
+        });
+
         test("should throw ArgumentNullException if arg is undefined", () =>
         {
             arg = undefined;
@@ -128,11 +128,11 @@ suite("Exceptions thrown", () =>
             {
                 exceptionHappened = true;
                 exceptionType = (<Object>exp).getTypeName();
-            }             
+            }
             assert.strictEqual(exceptionHappened, true);
             assert.strictEqual(exceptionType, "ArgumentNullException");
-        }); 
-        
+        });
+
         test("should not throw any exceptions if arg has value", () =>
         {
             arg = "arg";
@@ -145,11 +145,11 @@ suite("Exceptions thrown", () =>
             {
                 exceptionHappened = true;
                 exceptionType = (<Object>exp).getTypeName();
-            } 
-            assert.strictEqual(exceptionHappened, false); 
+            }
+            assert.strictEqual(exceptionHappened, false);
         });
     });
-    
+
     suite("ensureIsString", () =>
     {
         test("should be fine if the value is string", () =>
@@ -158,7 +158,7 @@ suite("Exceptions thrown", () =>
             given(value, "value").ensureIsString();
             assert.ok(true);
         });
-        
+
         test("should throw ArgumentException if the value is not string", () =>
         {
             try 
@@ -173,7 +173,7 @@ suite("Exceptions thrown", () =>
             }
         });
     });
-    
+
     suite("ensureIsNumber", () =>
     {
         test("should be fine if the value is number", () =>
@@ -197,7 +197,7 @@ suite("Exceptions thrown", () =>
             }
         });
     });
-    
+
     suite("ensureIsBoolean", () =>
     {
         test("should be fine if the value is boolean", () =>
@@ -221,7 +221,7 @@ suite("Exceptions thrown", () =>
             }
         });
     });
-    
+
     suite("ensureIsObject", () =>
     {
         test("should be fine if the value is object", () =>
@@ -245,7 +245,7 @@ suite("Exceptions thrown", () =>
             }
         });
     });
-    
+
     suite("ensureIsFunction", () =>
     {
         test("should be fine if the value is function", () =>
@@ -269,7 +269,7 @@ suite("Exceptions thrown", () =>
             }
         });
     });
-    
+
     suite("ensureIsArray", () =>
     {
         test("should be fine if the value is array", () =>
@@ -293,13 +293,13 @@ suite("Exceptions thrown", () =>
             }
         });
     });
-    
+
     suite("ensureIsType", () =>
     {
         class Foo { }
         class Bar { }
-        
-        
+
+
         test("should be fine if the value is of correct type", () =>
         {
             let value = new Foo();
@@ -321,23 +321,379 @@ suite("Exceptions thrown", () =>
             }
         });
     });
-    
-    // suite("ensureHasStructure", () =>
-    // {
-    //     let obj = {
-    //         strval: "foo",
-    //         invalstrval: true,
-    //         numval: 5,
-    //         invalnumval: "7",
-    //         boolval: false,
-    //         invalboolval: "true",
-    //         objval: {
-    //             neststrval: "bar",
-                
-    //         }
-    //     }
-    // });
-    
+
+    suite.only("ensureHasStructure", () =>
+    {
+        let obj = {
+            strval: "foo",
+            invalstrval: true,
+            numval: 5,
+            invalnumval: "7",
+            boolval: false,
+            invalboolval: "true",
+            objval: {
+                neststrval: "bar",
+            }
+        };
+
+        let structure = {
+            strval: "string",
+            invalstrval: "boolean",
+            numval: "number",
+            invalnumval: "string",
+            boolval: "boolean",
+            invalboolval: "string",
+            objval: {
+                neststrval: "string"
+            }
+        };
+
+        test("should successfully ensure object has structure", () =>
+        {
+            try 
+            {
+                given(obj, "obj").ensureHasStructure(structure);
+            }
+            catch (exp)
+            {
+                exceptionHappened = true;
+                exceptionType = (<Object>exp).getTypeName();
+            }
+            assert.strictEqual(exceptionHappened, false);
+        });
+        
+        test("should successfully ensure nested objects have structure", () =>
+        {
+            let obj = {
+                strval: "foo",
+                invalstrval: true,
+                numval: 5,
+                invalnumval: "7",
+                boolval: false,
+                invalboolval: "true",
+                objval: {
+                    neststrval: "bar",
+                    nestinvalstrval: false,
+                    nestnumval: 6,
+                    nestinvalnumval: "8",
+                    nestboolval: true,
+                    nestinvalboolval: "false",
+                    nestobjval: {
+                        neststrval: "buzz",
+                        nestinvalstrval: false,
+                        nestnumval: 6,
+                        nestinvalnumval: "8",
+                        nestboolval: true,
+                        nestinvalboolval: "false",
+                        nestobjval: {
+                            neststrval: "foo",
+                        }
+                    }
+                }
+            };
+            
+            try 
+            {
+                given(obj, "obj").ensureHasStructure(structure);
+            }
+            catch (exp)
+            {
+                exceptionHappened = true;
+                exceptionType = (<Object>exp).getTypeName();
+            }
+            assert.strictEqual(exceptionHappened, false);
+        });
+        
+        test("should throw ArgumentNullException if structure is null", () =>
+        {
+            let structure = null;
+            
+            try 
+            {
+                given(obj, "obj").ensureHasStructure(structure);
+            }
+            catch (exp)
+            {
+                exceptionHappened = true;
+                exceptionType = (<Object>exp).getTypeName();
+            }
+            assert.strictEqual(exceptionHappened, true);
+            assert.ok(exceptionType === "ArgumentNullException");
+        });
+        
+        test("should throw ArgumentNullException if structure is undefined", () =>
+        {
+            let structure = undefined;
+
+            try 
+            {
+                given(obj, "obj").ensureHasStructure(structure);
+            }
+            catch (exp)
+            {
+                exceptionHappened = true;
+                exceptionType = (<Object>exp).getTypeName();
+            }
+            assert.strictEqual(exceptionHappened, true);
+            assert.ok(exceptionType === "ArgumentNullException");
+        });
+        
+        test("should throw ArgumentException if strval is not a string", () =>
+        {
+            let obj = {
+                strval: 1,
+                invalstrval: true,
+                numval: 5,
+                invalnumval: "7",
+                boolval: false,
+                invalboolval: "true",
+                objval: {
+                    neststrval: "bar",
+                }
+            };
+            
+            try 
+            {
+                given(obj, "obj").ensureHasStructure(structure);
+            }
+            catch (exp)
+            {
+                exceptionHappened = true;
+                exceptionType = (<Object>exp).getTypeName();
+            }
+            assert.strictEqual(exceptionHappened, true);
+            assert.ok(exceptionType === "ArgumentException");    
+        });
+        
+        test("should throw ArgumentException if invalstrval is not a boolean", () =>
+        {
+            let obj = {
+                strval: "foo",
+                invalstrval: "not boolean",
+                numval: 5,
+                invalnumval: "7",
+                boolval: false,
+                invalboolval: "true",
+                objval: {
+                    neststrval: "bar",
+                }
+            };   
+            try 
+            {
+                given(obj, "obj").ensureHasStructure(structure);
+            }
+            catch (exp)
+            {
+                exceptionHappened = true;
+                exceptionType = (<Object>exp).getTypeName();
+            }
+            assert.strictEqual(exceptionHappened, true);
+            assert.ok(exceptionType === "ArgumentException");
+        });
+        
+        test("should throw ArgumentException if numval is not a number", () =>
+        {
+            let obj = {
+                strval: "foo",
+                invalstrval: true,
+                numval: "5",
+                invalnumval: "7",
+                boolval: false,
+                invalboolval: "true",
+                objval: {
+                    neststrval: "bar",
+                }
+            };
+            try 
+            {
+                given(obj, "obj").ensureHasStructure(structure);
+            }
+            catch (exp)
+            {
+                exceptionHappened = true;
+                exceptionType = (<Object>exp).getTypeName();
+            }
+            assert.strictEqual(exceptionHappened, true);
+            assert.ok(exceptionType === "ArgumentException");
+        });
+        
+        test("should throw ArgumentException if invalnumval is not a string", () =>
+        {
+            let obj = {
+                strval: "foo",
+                invalstrval: true,
+                numval: 5,
+                invalnumval: 7,
+                boolval: false,
+                invalboolval: "true",
+                objval: {
+                    neststrval: "bar",
+                }
+            };
+            try 
+            {
+                given(obj, "obj").ensureHasStructure(structure);
+            }
+            catch (exp)
+            {
+                exceptionHappened = true;
+                exceptionType = (<Object>exp).getTypeName();
+            }
+            assert.strictEqual(exceptionHappened, true);
+            assert.ok(exceptionType === "ArgumentException");
+        });
+        
+        test("should throw ArgumentException if boolval is not a boolean", () =>
+        {
+            let obj = {
+                strval: "foo",
+                invalstrval: true,
+                numval: 5,
+                invalnumval: "7",
+                boolval: "false",
+                invalboolval: "true",
+                objval: {
+                    neststrval: "bar",
+                }
+            };
+            try 
+            {
+                given(obj, "obj").ensureHasStructure(structure);
+            }
+            catch (exp)
+            {
+                exceptionHappened = true;
+                exceptionType = (<Object>exp).getTypeName();
+            }
+            assert.strictEqual(exceptionHappened, true);
+            assert.ok(exceptionType === "ArgumentException");
+        });
+        
+        test("should throw ArgumentException if invalboolval is not a string", () =>
+        {
+            let obj = {
+                strval: "foo",
+                invalstrval: true,
+                numval: 5,
+                invalnumval: "7",
+                boolval: false,
+                invalboolval: true,
+                objval: {
+                    neststrval: "bar",
+                }
+            };
+            try 
+            {
+                given(obj, "obj").ensureHasStructure(structure);
+            }
+            catch (exp)
+            {
+                exceptionHappened = true;
+                exceptionType = (<Object>exp).getTypeName();
+            }
+            assert.strictEqual(exceptionHappened, true);
+            assert.ok(exceptionType === "ArgumentException");
+        });
+        
+        test("should throw ArgumentException if objval is not an object", () =>
+        {
+            let obj = {
+                strval: "foo",
+                invalstrval: true,
+                numval: 5,
+                invalnumval: "7",
+                boolval: false,
+                invalboolval: "true",
+                objval: "not an object"
+            };
+            try 
+            {
+                given(obj, "obj").ensureHasStructure(structure);
+            }
+            catch (exp)
+            {
+                exceptionHappened = true;
+                exceptionType = (<Object>exp).getTypeName();
+            }
+            assert.strictEqual(exceptionHappened, true);
+            assert.ok(exceptionType === "ArgumentException");
+        });
+        
+        test("should successfully ensure object has structure if optional properties are empty", () =>
+        {
+            let obj = {
+                strval: " ",
+                invalstrval: " ",
+                numval: " ",
+                invalnumval: " ",
+                boolval: " ",
+                invalboolval: " ",
+                objval: {
+                    neststrval: " ",
+                }
+            };   
+            let structure = {
+                "strval?": "string",
+                "invalstrval?": "boolean",
+                "numval?": "number",
+                "invalnumval?": "string",
+                "boolval?": "boolean",
+                "invalboolval?": "string",
+                "objval?": {
+                    neststrval: "string"
+                }
+            };
+            
+            try 
+            {
+                given(obj, "obj").ensureHasStructure(structure);
+            }
+            catch (exp)
+            {
+                exceptionHappened = true;
+                exceptionType = (<Object>exp).getTypeName();
+            }
+            assert.strictEqual(exceptionHappened, false);
+        });
+        
+        test("should successfully ensure object has structure if optional properties have values", () =>
+        {
+            let obj = {
+                strval: "foo",
+                invalstrval: true,
+                numval: 5,
+                invalnumval: "7",
+                boolval: false,
+                invalboolval: "true",
+                objval: {
+                    neststrval: "bar",
+                }
+            };
+            let structure = {
+                "strval?": "string",
+                "invalstrval?": "boolean",
+                "numval?": "number",
+                "invalnumval?": "string",
+                "boolval?": "boolean",
+                "invalboolval?": "string",
+                "objval?": {
+                    neststrval: "string"
+                }
+            };
+
+            try 
+            {
+                given(obj, "obj").ensureHasStructure(structure);
+            }
+            catch (exp)
+            {
+                exceptionHappened = true;
+                exceptionType = (<Object>exp).getTypeName();
+            }
+            assert.strictEqual(exceptionHappened, false);
+        });
+    });
+
     suite("ensure", () =>
     {
         setup(() =>
@@ -345,9 +701,9 @@ suite("Exceptions thrown", () =>
             arg = "arg";
             argName = "argName";
         });
-        
+
         test("should throw ArgumentNullException if func is null", () =>
-        {            
+        {
             try 
             {
                 given(arg, argName).ensure(null, "reason");
@@ -358,9 +714,9 @@ suite("Exceptions thrown", () =>
                 exceptionType = (<Object>exp).getTypeName();
             }
             assert.strictEqual(exceptionHappened, true);
-            assert.strictEqual(exceptionType, "ArgumentNullException");            
+            assert.strictEqual(exceptionType, "ArgumentNullException");
         });
-        
+
         test("should throw ArgumentNullException if func is undefined", () =>
         {
             try 
@@ -373,9 +729,9 @@ suite("Exceptions thrown", () =>
                 exceptionType = (<Object>exp).getTypeName();
             }
             assert.strictEqual(exceptionHappened, true);
-            assert.strictEqual(exceptionType, "ArgumentNullException");   
+            assert.strictEqual(exceptionType, "ArgumentNullException");
         });
-        
+
         test("should throw InvalidArgumentException if func returns false", () =>
         {
             try 
@@ -388,9 +744,9 @@ suite("Exceptions thrown", () =>
                 exceptionType = (<Object>exp).getTypeName();
             }
             assert.strictEqual(exceptionHappened, true);
-            assert.strictEqual(exceptionType, "InvalidArgumentException");   
+            assert.strictEqual(exceptionType, "InvalidArgumentException");
         });
-        
+
         test("should not throw any exceptions if the func returns true", () =>
         {
             try 
@@ -405,7 +761,7 @@ suite("Exceptions thrown", () =>
             assert.strictEqual(exceptionHappened, false);
         });
     });
-    
+
     suite("ensure with reason", () =>
     {
         setup(() =>
@@ -413,7 +769,7 @@ suite("Exceptions thrown", () =>
             arg = "arg";
             argName = "argName";
         });
-        
+
         test("should throw InvalidArgumentException if func returns false and reason is null", () =>
         {
             try 
@@ -426,9 +782,9 @@ suite("Exceptions thrown", () =>
                 exceptionType = (<Object>exp).getTypeName();
             }
             assert.strictEqual(exceptionHappened, true);
-            assert.strictEqual(exceptionType, "InvalidArgumentException");      
+            assert.strictEqual(exceptionType, "InvalidArgumentException");
         });
-        
+
         test("should throw InvalidArgumentException if func returns false and reason is undefined", () =>
         {
             reason = undefined;
@@ -444,7 +800,7 @@ suite("Exceptions thrown", () =>
             assert.strictEqual(exceptionHappened, true);
             assert.strictEqual(exceptionType, "InvalidArgumentException");
         });
-        
+
         test("should throw InvalidArgumentException if func returns false and reason is empty string", () =>
         {
             reason = "";
@@ -458,9 +814,9 @@ suite("Exceptions thrown", () =>
                 exceptionType = (<Object>exp).getTypeName();
             }
             assert.strictEqual(exceptionHappened, true);
-            assert.strictEqual(exceptionType, "InvalidArgumentException");    
+            assert.strictEqual(exceptionType, "InvalidArgumentException");
         });
-        
+
         test("should throw InvalidArgumentException if func returns false and reason is whitespace string", () =>
         {
             reason = "  ";
@@ -474,9 +830,9 @@ suite("Exceptions thrown", () =>
                 exceptionType = (<Object>exp).getTypeName();
             }
             assert.strictEqual(exceptionHappened, true);
-            assert.strictEqual(exceptionType, "InvalidArgumentException");     
+            assert.strictEqual(exceptionType, "InvalidArgumentException");
         });
-        
+
         test("should throw ArgumentException if func returns false and reason is a valid string", () =>
         {
             reason = "reason";
@@ -490,7 +846,7 @@ suite("Exceptions thrown", () =>
                 exceptionType = (<Object>exp).getTypeName();
             }
             assert.strictEqual(exceptionHappened, true);
-            assert.strictEqual(exceptionType, "ArgumentException");  
+            assert.strictEqual(exceptionType, "ArgumentException");
         });
     });
 });
