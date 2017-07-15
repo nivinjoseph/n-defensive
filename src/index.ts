@@ -142,36 +142,41 @@ class EnsurerInternal<T> implements Ensurer<T>
         return this;
     }
     
-    private ensureHasStructureInternal(arg: any, schema: any)
+    private ensureHasStructureInternal(arg: any, schema: any, parentName?: string)
     {
         let types = ["string", "boolean", "number", "object"];
         
         for (let key in schema)
         {
             let isOptional = key.endsWith("?");
-            let type = schema[key];
-            type = typeof (type) === "string" ? type : "object";
-            if (types.every(t => t !== type))
-                throw new ArgumentException("structure", `invalid type specification '${type}'`);    
+            let name = isOptional ? key.substring(0, key.length - 1) : key;
+            if (name.isEmptyOrWhiteSpace())
+                throw new ArgumentException("structure", `invalid key specification '${key}'`);
+            let fullName = parentName ? `${parentName}.${name}` : name;
             
-            let value = arg[key];
+            let type = schema[key];
+            type = typeof (type) === "string" ? type.trim().toLowerCase() : "object";
+            if (types.every(t => t !== type))
+                throw new ArgumentException("structure", `invalid type specification '${type}' for key '${fullName}'`);    
+            
+            let value = arg[name];
             if (value === null || value === undefined)
             {
                 if (isOptional)
                     continue;
 
-                throw new ArgumentException(this._argName, `is missing required property '${key}' of type '${type}'`);
+                throw new ArgumentException(this._argName, `is missing required property '${fullName}' of type '${type}'`);
             }
             
-            if (type === "object")
+            if (type === "object" && typeof (schema[key]) !== "string")
             {
-                this.ensureHasStructureInternal(value, schema[key]);
+                this.ensureHasStructureInternal(value, schema[key], fullName);
             }   
             else
             {
                 if (typeof (value) !== type)
                     throw new ArgumentException(this._argName,
-                        `invalid value of type '${typeof (value)}' for property '${key}' of type '${type}'`);    
+                        `invalid value of type '${typeof (value)}' for property '${fullName}' of type '${type}'`);    
             } 
         } 
     }
