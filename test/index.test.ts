@@ -298,6 +298,7 @@ suite("Exceptions thrown", () =>
     {
         class Foo { }
         class Bar { }
+        class Foo2 extends Foo { }    
 
 
         test("should be fine if the value is of correct type", () =>
@@ -306,8 +307,15 @@ suite("Exceptions thrown", () =>
             given(value, "value").ensureIsType(Foo);
             assert.ok(true);
         });
-
-        test("should throw ArgumentException if the value is not string", () =>
+        
+        test("should be fine if value is subclass of type", () =>
+        {
+            let value = new Foo2();
+            given(value, "value").ensureIsType(Foo);
+            assert.ok(true);
+        });
+        
+        test("should throw ArgumentException if the value is not of correct type", () =>
         {
             try 
             {
@@ -320,9 +328,23 @@ suite("Exceptions thrown", () =>
                 assert.ok(error instanceof ArgumentException);
             }
         });
+
+        test("should throw ArgumentException if the value is superclass of type", () =>
+        {
+            try 
+            {
+                let value = new Foo();
+                given(value, "value").ensureIsType(Foo2);
+                assert.ok(false);
+            }
+            catch (error)
+            {
+                assert.ok(error instanceof ArgumentException);
+            }
+        });
     });
 
-    suite.only("ensureHasStructure", () =>
+    suite("ensureHasStructure", () =>
     {
         // in* = invalid type
         // ne* = null || undefined
@@ -394,46 +416,28 @@ suite("Exceptions thrown", () =>
                 opObjVal: {},
                 opInObjVal: "false",
                 opNeObjVal: null
-            },
-            inNesObjVal: 4, // bad
-            neNesObjVal: null, // bad
-            
-            opNesObjVal: {  // good at top level
-                strVal: "foo",
-                inStrVal: true,
-                neStrVal: null,
-
-                opStrVal: "bar",
-                opInStrVal: 5,
-                opNeStrVal: null,
-
-                numVal: 5,
-                inNumVal: "7",
-                neNumVal: null,
-
-                opNumVal: 6,
-                opInNumVal: "6",
-                opNeNumVal: null,
-
-                boolVal: false,
-                inBoolVal: "true",
-                neBoolVal: null,
-
-                opBoolVal: true,
-                opInBoolVal: "false",
-                opNeBoolVal: null,
-
-                objVal: {},
-                inObjVal: "true",
-                neObjVal: null,
-
-                opObjVal: {},
-                opInObjVal: "false",
-                opNeObjVal: null
-            },
-            opInNesObjVal: false, // bad
-            opNeNesObjVal: null // good
+            }
         };
+        
+        test("should be fine if arg is null", () =>
+        {
+            let arg = null;
+            let structure = {};
+            
+            given(arg, "arg").ensureHasStructure(structure);
+            
+            assert.ok(true);
+        });
+        
+        test("should be fine if arg is undefined", () =>
+        {
+            let arg = undefined;
+            let structure = {};
+
+            given(arg, "arg").ensureHasStructure(structure);
+            
+            assert.ok(true);
+        });
         
         test("should throw ArgumentNullException if structure is null", () =>
         {
@@ -667,6 +671,17 @@ suite("Exceptions thrown", () =>
 
             assert.ok(true);
         });
+        
+        test("should be fine given valid object value and object literal notation", () =>
+        {
+            let structure = {
+                objVal: {},
+            };
+
+            given(obj, "obj").ensureHasStructure(structure);
+
+            assert.ok(true);
+        });
 
         test("should throw ArgumentException given invalid object value", () =>
         {
@@ -699,6 +714,17 @@ suite("Exceptions thrown", () =>
 
             assert.ok(true);
         });
+        
+        test("should be fine given optional valid object value and object literal notation", () =>
+        {
+            let structure = {
+                "opObjVal?": {},
+            };
+
+            given(obj, "obj").ensureHasStructure(structure);
+
+            assert.ok(true);
+        });
 
         test("should throw ArgumentException given optional invalid object value", () =>
         {
@@ -721,319 +747,404 @@ suite("Exceptions thrown", () =>
             assert.ok(true);
         });
         
+        // nested 
+        test("should throw ArgumentException if structure has invalid type information", () =>
+        {
+            let structure = {
+                nesObjVal: {
+                    strVal: "sting"
+                }
+            };
 
-        // test("should successfully ensure object has structure", () =>
-        // {
-        //     try 
-        //     {
-        //         given(obj, "obj").ensureHasStructure(structure);
-        //     }
-        //     catch (exp)
-        //     {
-        //         exceptionHappened = true;
-        //         exceptionType = (<Object>exp).getTypeName();
-        //     }
-        //     assert.strictEqual(exceptionHappened, false);
-        // });
-        
-        // test("should successfully ensure nested objects have structure", () =>
-        // {
-        //     let obj = {
-        //         strval: "foo",
-        //         invalstrval: true,
-        //         numval: 5,
-        //         invalnumval: "7",
-        //         boolval: false,
-        //         invalboolval: "true",
-        //         objval: {
-        //             neststrval: "bar",
-        //             nestinvalstrval: false,
-        //             nestnumval: 6,
-        //             nestinvalnumval: "8",
-        //             nestboolval: true,
-        //             nestinvalboolval: "false",
-        //             nestobjval: {
-        //                 neststrval: "buzz",
-        //                 nestinvalstrval: false,
-        //                 nestnumval: 6,
-        //                 nestinvalnumval: "8",
-        //                 nestboolval: true,
-        //                 nestinvalboolval: "false",
-        //                 nestobjval: {
-        //                     neststrval: "foo",
-        //                 }
-        //             }
-        //         }
-        //     };
-            
-        //     try 
-        //     {
-        //         given(obj, "obj").ensureHasStructure(structure);
-        //     }
-        //     catch (exp)
-        //     {
-        //         exceptionHappened = true;
-        //         exceptionType = (<Object>exp).getTypeName();
-        //     }
-        //     assert.strictEqual(exceptionHappened, false);
-        // });
-        
-        
-        
-        // test("should throw ArgumentException if strval is not a string", () =>
-        // {
-        //     let obj = {
-        //         strval: 1,
-        //         invalstrval: true,
-        //         numval: 5,
-        //         invalnumval: "7",
-        //         boolval: false,
-        //         invalboolval: "true",
-        //         objval: {
-        //             neststrval: "bar",
-        //         }
-        //     };
-            
-        //     try 
-        //     {
-        //         given(obj, "obj").ensureHasStructure(structure);
-        //     }
-        //     catch (exp)
-        //     {
-        //         exceptionHappened = true;
-        //         exceptionType = (<Object>exp).getTypeName();
-        //     }
-        //     assert.strictEqual(exceptionHappened, true);
-        //     assert.ok(exceptionType === "ArgumentException");    
-        // });
-        
-        // test("should throw ArgumentException if invalstrval is not a boolean", () =>
-        // {
-        //     let obj = {
-        //         strval: "foo",
-        //         invalstrval: "not boolean",
-        //         numval: 5,
-        //         invalnumval: "7",
-        //         boolval: false,
-        //         invalboolval: "true",
-        //         objval: {
-        //             neststrval: "bar",
-        //         }
-        //     };   
-        //     try 
-        //     {
-        //         given(obj, "obj").ensureHasStructure(structure);
-        //     }
-        //     catch (exp)
-        //     {
-        //         exceptionHappened = true;
-        //         exceptionType = (<Object>exp).getTypeName();
-        //     }
-        //     assert.strictEqual(exceptionHappened, true);
-        //     assert.ok(exceptionType === "ArgumentException");
-        // });
-        
-        // test("should throw ArgumentException if numval is not a number", () =>
-        // {
-        //     let obj = {
-        //         strval: "foo",
-        //         invalstrval: true,
-        //         numval: "5",
-        //         invalnumval: "7",
-        //         boolval: false,
-        //         invalboolval: "true",
-        //         objval: {
-        //             neststrval: "bar",
-        //         }
-        //     };
-        //     try 
-        //     {
-        //         given(obj, "obj").ensureHasStructure(structure);
-        //     }
-        //     catch (exp)
-        //     {
-        //         exceptionHappened = true;
-        //         exceptionType = (<Object>exp).getTypeName();
-        //     }
-        //     assert.strictEqual(exceptionHappened, true);
-        //     assert.ok(exceptionType === "ArgumentException");
-        // });
-        
-        // test("should throw ArgumentException if invalnumval is not a string", () =>
-        // {
-        //     let obj = {
-        //         strval: "foo",
-        //         invalstrval: true,
-        //         numval: 5,
-        //         invalnumval: 7,
-        //         boolval: false,
-        //         invalboolval: "true",
-        //         objval: {
-        //             neststrval: "bar",
-        //         }
-        //     };
-        //     try 
-        //     {
-        //         given(obj, "obj").ensureHasStructure(structure);
-        //     }
-        //     catch (exp)
-        //     {
-        //         exceptionHappened = true;
-        //         exceptionType = (<Object>exp).getTypeName();
-        //     }
-        //     assert.strictEqual(exceptionHappened, true);
-        //     assert.ok(exceptionType === "ArgumentException");
-        // });
-        
-        // test("should throw ArgumentException if boolval is not a boolean", () =>
-        // {
-        //     let obj = {
-        //         strval: "foo",
-        //         invalstrval: true,
-        //         numval: 5,
-        //         invalnumval: "7",
-        //         boolval: "false",
-        //         invalboolval: "true",
-        //         objval: {
-        //             neststrval: "bar",
-        //         }
-        //     };
-        //     try 
-        //     {
-        //         given(obj, "obj").ensureHasStructure(structure);
-        //     }
-        //     catch (exp)
-        //     {
-        //         exceptionHappened = true;
-        //         exceptionType = (<Object>exp).getTypeName();
-        //     }
-        //     assert.strictEqual(exceptionHappened, true);
-        //     assert.ok(exceptionType === "ArgumentException");
-        // });
-        
-        // test("should throw ArgumentException if invalboolval is not a string", () =>
-        // {
-        //     let obj = {
-        //         strval: "foo",
-        //         invalstrval: true,
-        //         numval: 5,
-        //         invalnumval: "7",
-        //         boolval: false,
-        //         invalboolval: true,
-        //         objval: {
-        //             neststrval: "bar",
-        //         }
-        //     };
-        //     try 
-        //     {
-        //         given(obj, "obj").ensureHasStructure(structure);
-        //     }
-        //     catch (exp)
-        //     {
-        //         exceptionHappened = true;
-        //         exceptionType = (<Object>exp).getTypeName();
-        //     }
-        //     assert.strictEqual(exceptionHappened, true);
-        //     assert.ok(exceptionType === "ArgumentException");
-        // });
-        
-        // test("should throw ArgumentException if objval is not an object", () =>
-        // {
-        //     let obj = {
-        //         strval: "foo",
-        //         invalstrval: true,
-        //         numval: 5,
-        //         invalnumval: "7",
-        //         boolval: false,
-        //         invalboolval: "true",
-        //         objval: "not an object"
-        //     };
-        //     try 
-        //     {
-        //         given(obj, "obj").ensureHasStructure(structure);
-        //     }
-        //     catch (exp)
-        //     {
-        //         exceptionHappened = true;
-        //         exceptionType = (<Object>exp).getTypeName();
-        //     }
-        //     assert.strictEqual(exceptionHappened, true);
-        //     assert.ok(exceptionType === "ArgumentException");
-        // });
-        
-        // test("should successfully ensure object has structure if optional properties are empty", () =>
-        // {
-        //     let obj = {
-        //         strval: " ",
-        //         invalstrval: " ",
-        //         numval: " ",
-        //         invalnumval: " ",
-        //         boolval: " ",
-        //         invalboolval: " ",
-        //         objval: {
-        //             neststrval: " ",
-        //         }
-        //     };   
-        //     let structure = {
-        //         "strval?": "string",
-        //         "invalstrval?": "boolean",
-        //         "numval?": "number",
-        //         "invalnumval?": "string",
-        //         "boolval?": "boolean",
-        //         "invalboolval?": "string",
-        //         "objval?": {
-        //             neststrval: "string"
-        //         }
-        //     };
-            
-        //     try 
-        //     {
-        //         given(obj, "obj").ensureHasStructure(structure);
-        //     }
-        //     catch (exp)
-        //     {
-        //         exceptionHappened = true;
-        //         exceptionType = (<Object>exp).getTypeName();
-        //     }
-        //     assert.strictEqual(exceptionHappened, false);
-        // });
-        
-        // test("should successfully ensure object has structure if optional properties have values", () =>
-        // {
-        //     let obj = {
-        //         strval: "foo",
-        //         invalstrval: true,
-        //         numval: 5,
-        //         invalnumval: "7",
-        //         boolval: false,
-        //         invalboolval: "true",
-        //         objval: {
-        //             neststrval: "bar",
-        //         }
-        //     };
-        //     let structure = {
-        //         "strval?": "string",
-        //         "invalstrval?": "boolean",
-        //         "numval?": "number",
-        //         "invalnumval?": "string",
-        //         "boolval?": "boolean",
-        //         "invalboolval?": "string",
-        //         "objval?": {
-        //             neststrval: "string"
-        //         }
-        //     };
+            assert.throws(() => given(obj, "obj").ensureHasStructure(structure),
+                (exp: Exception) => exp.name === "ArgumentException");
+        });
 
-        //     try 
-        //     {
-        //         given(obj, "obj").ensureHasStructure(structure);
-        //     }
-        //     catch (exp)
-        //     {
-        //         exceptionHappened = true;
-        //         exceptionType = (<Object>exp).getTypeName();
-        //     }
-        //     assert.strictEqual(exceptionHappened, false);
-        // });
+        // nested string
+        test("should be fine given valid nested string value", () =>
+        {
+            let structure: any = {
+                strVal: "string",
+            };
+            
+            structure = {
+                nesObjVal: structure
+            };
+
+            given(obj, "obj").ensureHasStructure(structure);
+
+            assert.ok(true);
+        });
+
+        test("should throw ArgumentException given nested invalid string value", () =>
+        {
+            let structure: any = {
+                inStrVal: "string"
+            };
+            
+            structure = {
+                nesObjVal: structure
+            };
+
+            assert.throws(() => given(obj, "obj").ensureHasStructure(structure),
+                (exp: Exception) => exp.name === "ArgumentException");
+        });
+
+        test("should throw ArgumentException given nested non-existant string value", () =>
+        {
+            let structure: any = {
+                neStrVal: "string"
+            };
+            
+            structure = {
+                nesObjVal: structure
+            };
+
+            assert.throws(() => given(obj, "obj").ensureHasStructure(structure),
+                (exp: Exception) => exp.name === "ArgumentException");
+        });
+
+        // optional string
+        test("should be fine given nested optional valid string value", () =>
+        {
+            let structure: any = {
+                "opStrVal?": "string",
+            };
+            
+            structure = {
+                nesObjVal: structure
+            };
+
+            given(obj, "obj").ensureHasStructure(structure);
+
+            assert.ok(true);
+        });
+
+        test("should throw ArgumentException given nested optional invalid string value", () =>
+        {
+            let structure: any = {
+                "opInStrVal?": "string"
+            };
+            
+            structure = {
+                nesObjVal: structure
+            };
+
+            assert.throws(() => given(obj, "obj").ensureHasStructure(structure),
+                (exp: Exception) => exp.name === "ArgumentException");
+        });
+
+        test("should be fine given nested optional non-existant string value", () =>
+        {
+            let structure: any = {
+                "opNeStrVal?": "string"
+            };
+            
+            structure = {
+                nesObjVal: structure
+            };
+
+            given(obj, "obj").ensureHasStructure(structure);
+
+            assert.ok(true);
+        });
+
+        // number
+        test("should be fine given nested valid number value", () =>
+        {
+            let structure: any = {
+                numVal: "number",
+            };
+            
+            structure = {
+                nesObjVal: structure
+            };
+
+            given(obj, "obj").ensureHasStructure(structure);
+
+            assert.ok(true);
+        });
+
+        test("should throw ArgumentException given nested invalid number value", () =>
+        {
+            let structure: any = {
+                inNumVal: "number"
+            };
+            
+            structure = {
+                nesObjVal: structure
+            };
+
+            assert.throws(() => given(obj, "obj").ensureHasStructure(structure),
+                (exp: Exception) => exp.name === "ArgumentException");
+        });
+
+        test("should throw ArgumentException given nested non-existant number value", () =>
+        {
+            let structure: any = {
+                neNumVal: "number"
+            };
+            
+            structure = {
+                nesObjVal: structure
+            };
+
+            assert.throws(() => given(obj, "obj").ensureHasStructure(structure),
+                (exp: Exception) => exp.name === "ArgumentException");
+        });
+
+        // optional number
+        test("should be fine given nested optional valid number value", () =>
+        {
+            let structure: any = {
+                "opNumVal?": "number",
+            };
+            
+            structure = {
+                nesObjVal: structure
+            };
+
+            given(obj, "obj").ensureHasStructure(structure);
+
+            assert.ok(true);
+        });
+
+        test("should throw ArgumentException given nested optional invalid number value", () =>
+        {
+            let structure: any = {
+                "opInNumVal?": "number"
+            };
+            
+            structure = {
+                nesObjVal: structure
+            };
+
+            assert.throws(() => given(obj, "obj").ensureHasStructure(structure),
+                (exp: Exception) => exp.name === "ArgumentException");
+        });
+
+        test("should be fine given nested optional non-existant number value", () =>
+        {
+            let structure: any = {
+                "opNeNumVal?": "number"
+            };
+            
+            structure = {
+                nesObjVal: structure
+            };
+
+            given(obj, "obj").ensureHasStructure(structure);
+
+            assert.ok(true);
+        });
+
+        // boolean
+        test("should be fine given nested valid boolean value", () =>
+        {
+            let structure: any = {
+                boolVal: "boolean",
+            };
+            
+            structure = {
+                nesObjVal: structure
+            };
+
+            given(obj, "obj").ensureHasStructure(structure);
+
+            assert.ok(true);
+        });
+
+        test("should throw ArgumentException given nested invalid boolean value", () =>
+        {
+            let structure: any = {
+                inBoolVal: "boolean"
+            };
+            
+            structure = {
+                nesObjVal: structure
+            };
+
+            assert.throws(() => given(obj, "obj").ensureHasStructure(structure),
+                (exp: Exception) => exp.name === "ArgumentException");
+        });
+
+        test("should throw ArgumentException given nested non-existant boolean value", () =>
+        {
+            let structure: any = {
+                neBoolVal: "boolean"
+            };
+            
+            structure = {
+                nesObjVal: structure
+            };
+
+            assert.throws(() => given(obj, "obj").ensureHasStructure(structure),
+                (exp: Exception) => exp.name === "ArgumentException");
+        });
+
+        // optional boolean
+        test("should be fine given nested optional valid boolean value", () =>
+        {
+            let structure: any = {
+                "opBoolVal?": "boolean",
+            };
+            
+            structure = {
+                nesObjVal: structure
+            };
+
+            given(obj, "obj").ensureHasStructure(structure);
+
+            assert.ok(true);
+        });
+
+        test("should throw ArgumentException given nested optional invalid boolean value", () =>
+        {
+            let structure: any = {
+                "opInBoolVal?": "boolean"
+            };
+            
+            structure = {
+                nesObjVal: structure
+            };
+
+            assert.throws(() => given(obj, "obj").ensureHasStructure(structure),
+                (exp: Exception) => exp.name === "ArgumentException");
+        });
+
+        test("should be fine given nested optional non-existant boolean value", () =>
+        {
+            let structure: any = {
+                "opNeBoolVal?": "boolean"
+            };
+            
+            structure = {
+                nesObjVal: structure
+            };
+
+            given(obj, "obj").ensureHasStructure(structure);
+
+            assert.ok(true);
+        });
+
+        // object
+        test("should be fine given nested valid object value", () =>
+        {
+            let structure: any = {
+                objVal: "object",
+            };
+            
+            structure = {
+                nesObjVal: structure
+            };
+
+            given(obj, "obj").ensureHasStructure(structure);
+
+            assert.ok(true);
+        });
+
+        test("should be fine given nested valid object value and object literal notation", () =>
+        {
+            let structure: any = {
+                objVal: {},
+            };
+            
+            structure = {
+                nesObjVal: structure
+            };
+
+            given(obj, "obj").ensureHasStructure(structure);
+
+            assert.ok(true);
+        });
+
+        test("should throw ArgumentException given nested invalid object value", () =>
+        {
+            let structure: any = {
+                inObjVal: "object"
+            };
+            
+            structure = {
+                nesObjVal: structure
+            };
+
+            assert.throws(() => given(obj, "obj").ensureHasStructure(structure),
+                (exp: Exception) => exp.name === "ArgumentException");
+        });
+
+        test("should throw ArgumentException given nested non-existant object value", () =>
+        {
+            let structure: any = {
+                neObjVal: "object"
+            };
+            
+            structure = {
+                nesObjVal: structure
+            };
+
+            assert.throws(() => given(obj, "obj").ensureHasStructure(structure),
+                (exp: Exception) => exp.name === "ArgumentException");
+        });
+
+        // optional object
+        test("should be fine given nested optional valid object value", () =>
+        {
+            let structure: any = {
+                "opObjVal?": "object",
+            };
+            
+            structure = {
+                nesObjVal: structure
+            };
+
+            given(obj, "obj").ensureHasStructure(structure);
+
+            assert.ok(true);
+        });
+
+        test("should be fine given nested optional valid object value and object literal notation", () =>
+        {
+            let structure: any = {
+                "opObjVal?": {},
+            };
+            
+            structure = {
+                nesObjVal: structure
+            };
+
+            given(obj, "obj").ensureHasStructure(structure);
+
+            assert.ok(true);
+        });
+
+        test("should throw ArgumentException given nested optional invalid object value", () =>
+        {
+            let structure: any = {
+                "opInObjVal?": "object"
+            };
+            
+            structure = {
+                nesObjVal: structure
+            };
+
+            assert.throws(() => given(obj, "obj").ensureHasStructure(structure),
+                (exp: Exception) => exp.name === "ArgumentException");
+        });
+
+        test("should be fine given nested optional non-existant object value", () =>
+        {
+            let structure: any = {
+                "opNeObjVal?": "object"
+            };
+            
+            structure = {
+                nesObjVal: structure
+            };
+
+            given(obj, "obj").ensureHasStructure(structure);
+
+            assert.ok(true);
+        });
     });
 
     suite("ensure", () =>
