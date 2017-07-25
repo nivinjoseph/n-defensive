@@ -384,6 +384,22 @@ suite("Exceptions thrown", () =>
             opInObjVal: "false", // bad
             opNeObjVal: null, // good
             
+            arrayVal: [1, 2, 3], // good
+            inArrayVal: true, // bad
+            neArrayVal: null, // bad
+            
+            opArrayVal: ["trey", "charlene"], // good
+            opInArrayVal: { }, // bad
+            opNeArrayVal: null, // good
+            
+            typedArrayVal: [1, 2, 3], // good
+            inTypedArrayVal: [1, 2, 3], // bad
+            neTypedArrayVal: null, // bad
+
+            opTypedArrayVal: ["trey", "charlene"], // good
+            opInTypedArrayVal: [{}, {}], // bad
+            opNeTypedArrayVal: null, // good
+            
             nesObjVal: { // good at top level
                 strVal: "foo",
                 inStrVal: true,
@@ -415,7 +431,15 @@ suite("Exceptions thrown", () =>
 
                 opObjVal: {},
                 opInObjVal: "false",
-                opNeObjVal: null
+                opNeObjVal: null,
+                
+                arrayVal: [1, 2, 3],
+                inArrayVal: true,
+                neArrayVal: null,
+
+                opArrayVal: ["trey", "charlene"],
+                opInArrayVal: {},
+                opNeArrayVal: null,
             }
         };
         
@@ -660,6 +684,136 @@ suite("Exceptions thrown", () =>
             assert.ok(true);
         });
         
+        // array
+        test("should be fine given valid array value", () =>
+        {
+            let structure = {
+                arrayVal: "array",
+            };
+
+            given(obj, "obj").ensureHasStructure(structure);
+
+            assert.ok(true);
+        });
+
+        test("should throw ArgumentException given invalid array value", () =>
+        {
+            let structure = {
+                inArrayVal: "array"
+            };
+
+            assert.throws(() => given(obj, "obj").ensureHasStructure(structure),
+                (exp: Exception) => exp.name === "ArgumentException");
+        });
+
+        test("should throw ArgumentException given non-existant array value", () =>
+        {
+            let structure: any = {
+                neArrayVal: "array"
+            };
+
+            assert.throws(() => given(obj, "obj").ensureHasStructure(structure),
+                (exp: Exception) => exp.name === "ArgumentException");
+        });
+
+        // optional array
+        test("should be fine given optional valid array value", () =>
+        {
+            let structure = {
+                "opArrayVal?": "array",
+            };
+
+            given(obj, "obj").ensureHasStructure(structure);
+
+            assert.ok(true);
+        });
+
+        test("should throw ArgumentException given optional invalid array value", () =>
+        {
+            let structure = {
+                "opInArrayVal?": "array"
+            };
+
+            assert.throws(() => given(obj, "obj").ensureHasStructure(structure),
+                (exp: Exception) => exp.name === "ArgumentException");
+        });
+
+        test("should be fine given optional non-existant array value", () =>
+        {
+            let structure: any = {
+                "opNeArrayVal?": "array"
+            };
+
+            given(obj, "obj").ensureHasStructure(structure);
+
+            assert.ok(true);
+        });
+        
+        // typed array
+        test("should be fine given valid typed array value", () =>
+        {
+            let structure = {
+                typedArrayVal: ["number"],
+            };
+
+            given(obj, "obj").ensureHasStructure(structure);
+
+            assert.ok(true);
+        });
+
+        test("should throw ArgumentException given invalid typed array value", () =>
+        {
+            let structure = {
+                inTypedArrayVal: ["boolean"]
+            };
+
+            assert.throws(() => given(obj, "obj").ensureHasStructure(structure),
+                (exp: Exception) => exp.name === "ArgumentException");
+        });
+
+        test("should throw ArgumentException given non-existant typed array value", () =>
+        {
+            let structure: any = {
+                neTypedArrayVal: ["object"]
+            };
+
+            assert.throws(() => given(obj, "obj").ensureHasStructure(structure),
+                (exp: Exception) => exp.name === "ArgumentException");
+        });
+
+        // optional array
+        test("should be fine given optional valid typed array value", () =>
+        {
+            let structure = {
+                "opTypedArrayVal?": ["string"],
+            };
+
+            given(obj, "obj").ensureHasStructure(structure);
+
+            assert.ok(true);
+        });
+
+        test("should throw ArgumentException given optional invalid typed array value", () =>
+        {
+            let structure = {
+                "opInTypedArrayVal?": ["number"]
+            };
+
+            assert.throws(() => given(obj, "obj").ensureHasStructure(structure),
+                (exp: Exception) => exp.name === "ArgumentException");
+        });
+
+        test("should be fine given optional non-existant typed array value", () =>
+        {
+            let structure: any = {
+                "opNeTypedArrayVal?": ["array"]
+            };
+
+            given(obj, "obj").ensureHasStructure(structure);
+
+            assert.ok(true);
+        });
+        
         // object
         test("should be fine given valid object value", () =>
         {
@@ -747,7 +901,7 @@ suite("Exceptions thrown", () =>
             assert.ok(true);
         });
         
-        // nested 
+        // nested
         test("should throw ArgumentException if structure has invalid type information", () =>
         {
             let structure = {

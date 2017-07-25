@@ -78,30 +78,59 @@ class EnsurerInternal {
         return this;
     }
     ensureHasStructureInternal(arg, schema, parentName) {
-        let types = ["string", "boolean", "number", "object"];
         for (let key in schema) {
             let isOptional = key.endsWith("?");
             let name = isOptional ? key.substring(0, key.length - 1) : key;
             if (name.isEmptyOrWhiteSpace())
                 throw new n_exception_1.ArgumentException("structure", `invalid key specification '${key}'`);
             let fullName = parentName ? `${parentName}.${name}` : name;
-            let type = schema[key];
-            type = typeof (type) === "string" ? type.trim().toLowerCase() : "object";
-            if (types.every(t => t !== type))
-                throw new n_exception_1.ArgumentException("structure", `invalid type specification '${type}' for key '${fullName}'`);
-            let value = arg[name];
+            const typeInfo = schema[key];
+            const typeName = this.getTypeNameInternal(typeInfo, fullName);
+            const value = arg[name];
             if (value === null || value === undefined) {
                 if (isOptional)
                     continue;
-                throw new n_exception_1.ArgumentException(this._argName, `is missing required property '${fullName}' of type '${type}'`);
+                throw new n_exception_1.ArgumentException(this._argName, `is missing required property '${fullName}' of type '${typeName}'`);
             }
-            if (type === "object" && typeof (schema[key]) !== "string") {
-                this.ensureHasStructureInternal(value, schema[key], fullName);
+            this.ensureHasTypeInternal(typeName, typeInfo, fullName, value);
+        }
+    }
+    getTypeNameInternal(typeInfo, fullName) {
+        let types = ["string", "boolean", "number", "object", "array"];
+        if (typeInfo === null || typeInfo === undefined)
+            throw new n_exception_1.ArgumentException("structure", `null type specification for key '${fullName}'`);
+        if (typeof (typeInfo) !== "string" && typeof (typeInfo) !== "object")
+            throw new n_exception_1.ArgumentException("structure", `invalid type specification '${typeInfo}' for key '${fullName}'`);
+        const typeName = typeof (typeInfo) === "string" ? typeInfo.trim().toLowerCase() : Array.isArray(typeInfo) ? "array" : "object";
+        if (types.every(t => t !== typeName))
+            throw new n_exception_1.ArgumentException("structure", `invalid type specification '${typeInfo}' for key '${fullName}'`);
+        return typeName;
+    }
+    ensureHasTypeInternal(typeName, typeInfo, fullName, value) {
+        if (typeName === "object") {
+            if (typeof (typeInfo) !== "string") {
+                this.ensureHasStructureInternal(value, typeInfo, fullName);
             }
             else {
-                if (typeof (value) !== type)
-                    throw new n_exception_1.ArgumentException(this._argName, `invalid value of type '${typeof (value)}' for property '${fullName}' of type '${type}'`);
+                if (typeof (value) !== typeName)
+                    throw new n_exception_1.ArgumentException(this._argName, `invalid value of type '${typeof (value)}' for property '${fullName}' of type '${typeName}'`);
             }
+        }
+        else if (typeName === "array") {
+            if (!Array.isArray(value))
+                throw new n_exception_1.ArgumentException(this._argName, `invalid value of type '${typeof (value)}' for property '${fullName}' of type '${typeName}'`);
+            if (typeof (typeInfo) !== "string") {
+                const typeInfoArray = typeInfo;
+                if (typeInfoArray.length > 0) {
+                    const arrayTypeInfo = typeInfoArray[0];
+                    const arrayTypeName = this.getTypeNameInternal(arrayTypeInfo, fullName);
+                    value.forEach(t => this.ensureHasTypeInternal(arrayTypeName, arrayTypeInfo, fullName, t));
+                }
+            }
+        }
+        else {
+            if (typeof (value) !== typeName)
+                throw new n_exception_1.ArgumentException(this._argName, `invalid value of type '${typeof (value)}' for property '${fullName}' of type '${typeName}'`);
         }
     }
     ensure(func, reason) {

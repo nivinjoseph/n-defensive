@@ -144,8 +144,6 @@ class EnsurerInternal<T> implements Ensurer<T>
     
     private ensureHasStructureInternal(arg: any, schema: any, parentName?: string)
     {
-        let types = ["string", "boolean", "number", "object"];
-        
         for (let key in schema)
         {
             let isOptional = key.endsWith("?");
@@ -154,31 +152,78 @@ class EnsurerInternal<T> implements Ensurer<T>
                 throw new ArgumentException("structure", `invalid key specification '${key}'`);
             let fullName = parentName ? `${parentName}.${name}` : name;
             
-            let type = schema[key];
-            type = typeof (type) === "string" ? type.trim().toLowerCase() : "object";
-            if (types.every(t => t !== type))
-                throw new ArgumentException("structure", `invalid type specification '${type}' for key '${fullName}'`);    
+            const typeInfo = schema[key];
+            const typeName = this.getTypeNameInternal(typeInfo, fullName);
             
-            let value = arg[name];
+            const value = arg[name];
             if (value === null || value === undefined)
             {
                 if (isOptional)
                     continue;
 
-                throw new ArgumentException(this._argName, `is missing required property '${fullName}' of type '${type}'`);
+                throw new ArgumentException(this._argName, `is missing required property '${fullName}' of type '${typeName}'`);
             }
             
-            if (type === "object" && typeof (schema[key]) !== "string")
+            this.ensureHasTypeInternal(typeName, typeInfo, fullName, value);
+        } 
+    }
+    
+    private getTypeNameInternal(typeInfo: any, fullName: string): string
+    {
+        let types = ["string", "boolean", "number", "object", "array"];
+        
+        if (typeInfo === null || typeInfo === undefined)
+            throw new ArgumentException("structure", `null type specification for key '${fullName}'`);
+
+        if (typeof (typeInfo) !== "string" && typeof (typeInfo) !== "object")
+            throw new ArgumentException("structure", `invalid type specification '${typeInfo}' for key '${fullName}'`);
+
+        const typeName = typeof (typeInfo) === "string" ? typeInfo.trim().toLowerCase() : Array.isArray(typeInfo) ? "array" : "object";
+        if (types.every(t => t !== typeName))
+            throw new ArgumentException("structure", `invalid type specification '${typeInfo}' for key '${fullName}'`);
+        
+        return typeName;
+    }
+    
+    private ensureHasTypeInternal(typeName: string, typeInfo: any, fullName: string, value: any): void
+    {
+        if (typeName === "object")
+        {
+            if (typeof (typeInfo) !== "string")
             {
-                this.ensureHasStructureInternal(value, schema[key], fullName);
-            }   
+                this.ensureHasStructureInternal(value, typeInfo, fullName);
+            }
             else
             {
-                if (typeof (value) !== type)
+                if (typeof (value) !== typeName)
                     throw new ArgumentException(this._argName,
-                        `invalid value of type '${typeof (value)}' for property '${fullName}' of type '${type}'`);    
-            } 
-        } 
+                        `invalid value of type '${typeof (value)}' for property '${fullName}' of type '${typeName}'`);
+            }
+        }
+        else if (typeName === "array")
+        {
+            if (!Array.isArray(value))
+                throw new ArgumentException(this._argName,
+                    `invalid value of type '${typeof (value)}' for property '${fullName}' of type '${typeName}'`);
+
+            if (typeof (typeInfo) !== "string")
+            {
+                const typeInfoArray = typeInfo as Array<any>;
+                if (typeInfoArray.length > 0)
+                {
+                    const arrayTypeInfo = typeInfoArray[0];
+                    const arrayTypeName = this.getTypeNameInternal(arrayTypeInfo, fullName);
+
+                    (<Array<any>>value).forEach(t => this.ensureHasTypeInternal(arrayTypeName, arrayTypeInfo, fullName, t));
+                }
+            }
+        }
+        else
+        {
+            if (typeof (value) !== typeName)
+                throw new ArgumentException(this._argName,
+                    `invalid value of type '${typeof (value)}' for property '${fullName}' of type '${typeName}'`);
+        }
     }
 
     public ensure(func: (arg: T) => boolean): Ensurer<T>;   
