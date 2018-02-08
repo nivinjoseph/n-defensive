@@ -1,7 +1,7 @@
 import * as assert from "assert";
 import { given } from "../src/index";
-import "n-ext";
-import { Exception, ArgumentException, ArgumentNullException } from "n-exception";
+import "@nivinjoseph/n-ext";
+import { Exception, ArgumentException, ArgumentNullException } from "@nivinjoseph/n-exception";
 
 suite("Exceptions thrown", () =>
 {

@@ -1,10 +1,10 @@
-import "n-ext";
+import "@nivinjoseph/n-ext";
 import  
 {
     ArgumentException,
     ArgumentNullException,
     InvalidArgumentException,
-} from "n-exception";
+} from "@nivinjoseph/n-exception";
 
 export interface Ensurer<T>
 {

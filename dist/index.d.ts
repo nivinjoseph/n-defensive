@@ -1,4 +1,4 @@
-import "n-ext";
+import "@nivinjoseph/n-ext";
 export interface Ensurer<T> {
     ensureHasValue(): Ensurer<T>;
     ensureIsString(): Ensurer<T>;

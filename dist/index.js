@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-require("n-ext");
-const n_exception_1 = require("n-exception");
+require("@nivinjoseph/n-ext");
+const n_exception_1 = require("@nivinjoseph/n-exception");
 function given(arg, argName) {
     if (argName == null || argName.isEmptyOrWhiteSpace())
         throw new n_exception_1.ArgumentNullException("argName");
