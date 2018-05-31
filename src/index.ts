@@ -45,6 +45,9 @@ class EnsurerInternal<T> implements Ensurer<T>
     {
         if (this._arg === null || this._arg === undefined)
             throw new ArgumentNullException(this._argName);
+        
+        if (typeof (this._arg) === "string" && (<string>this._arg).isEmptyOrWhiteSpace())
+            throw new ArgumentException(this._argName, "string value cannot be empty or whitespace");    
 
         return this;
     }

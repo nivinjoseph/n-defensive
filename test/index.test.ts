@@ -132,6 +132,40 @@ suite("Exceptions thrown", () =>
             assert.strictEqual(exceptionHappened, true);
             assert.strictEqual(exceptionType, "ArgumentNullException");
         });
+        
+        test("should throw ArgumentException if arg is empty string", () =>
+        {
+            arg = "";
+            argName = "argName";
+            try 
+            {
+                given(arg, argName).ensureHasValue();
+            }
+            catch (exp)
+            {
+                exceptionHappened = true;
+                exceptionType = (<Object>exp).getTypeName();
+            }
+            assert.strictEqual(exceptionHappened, true);
+            assert.strictEqual(exceptionType, "ArgumentException");
+        });
+        
+        test("should throw ArgumentException if arg is whitespace string", () =>
+        {
+            arg = "   ";
+            argName = "argName";
+            try 
+            {
+                given(arg, argName).ensureHasValue();
+            }
+            catch (exp)
+            {
+                exceptionHappened = true;
+                exceptionType = (<Object>exp).getTypeName();
+            }
+            assert.strictEqual(exceptionHappened, true);
+            assert.strictEqual(exceptionType, "ArgumentException");
+        });
 
         test("should not throw any exceptions if arg has value", () =>
         {
