@@ -16,6 +16,8 @@ class EnsurerInternal {
     ensureHasValue() {
         if (this._arg === null || this._arg === undefined)
             throw new n_exception_1.ArgumentNullException(this._argName);
+        if (typeof (this._arg) === "string" && this._arg.isEmptyOrWhiteSpace())
+            throw new n_exception_1.ArgumentException(this._argName, "string value cannot be empty or whitespace");
         return this;
     }
     ensureIsString() {
