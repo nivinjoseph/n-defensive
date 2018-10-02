@@ -1,7 +1,7 @@
 import * as assert from "assert";
 import { given } from "../src/index";
 import "@nivinjoseph/n-ext";
-import { Exception, ArgumentException, ArgumentNullException } from "@nivinjoseph/n-exception";
+import { Exception, ArgumentException } from "@nivinjoseph/n-exception";
 
 suite("Exceptions thrown", () =>
 {
@@ -1377,6 +1377,7 @@ suite("Exceptions thrown", () =>
         {
             try 
             {
+                // @ts-ignore
                 given(arg, argName).ensure(arg => false);
             }
             catch (exp)
@@ -1392,6 +1393,7 @@ suite("Exceptions thrown", () =>
         {
             try 
             {
+                // @ts-ignore
                 given(arg, argName).ensure(arg => true, "reason");
             }
             catch (exp)
@@ -1415,6 +1417,7 @@ suite("Exceptions thrown", () =>
         {
             try 
             {
+                // @ts-ignore
                 given(arg, argName).ensure(arg => false, reason);
             }
             catch (exp)
@@ -1431,6 +1434,7 @@ suite("Exceptions thrown", () =>
             reason = undefined;
             try 
             {
+                // @ts-ignore
                 given(arg, argName).ensure(arg => false, reason);
             }
             catch (exp)
@@ -1447,6 +1451,7 @@ suite("Exceptions thrown", () =>
             reason = "";
             try 
             {
+                // @ts-ignore
                 given(arg, argName).ensure(arg => false, reason);
             }
             catch (exp)
@@ -1463,6 +1468,7 @@ suite("Exceptions thrown", () =>
             reason = "  ";
             try 
             {
+                // @ts-ignore
                 given(arg, argName).ensure(arg => false, reason);
             }
             catch (exp)
@@ -1479,6 +1485,7 @@ suite("Exceptions thrown", () =>
             reason = "reason";
             try 
             {
+                // @ts-ignore
                 given(arg, argName).ensure(arg => false, reason);
             }
             catch (exp)
