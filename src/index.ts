@@ -4,6 +4,7 @@ import
     ArgumentException,
     ArgumentNullException,
     InvalidArgumentException,
+    InvalidOperationException,
 } from "@nivinjoseph/n-exception";
 
 export interface Ensurer<T>
@@ -26,7 +27,7 @@ export function given<T>(arg: T, argName: string): Ensurer<T>
     if (argName == null || argName.isEmptyOrWhiteSpace())
         throw new ArgumentNullException("argName");
     
-    return new EnsurerInternal(arg, argName);
+    return new EnsurerInternal(arg, argName.trim());
 }
 
 class EnsurerInternal<T> implements Ensurer<T>
@@ -144,6 +145,30 @@ class EnsurerInternal<T> implements Ensurer<T>
            
         return this;
     }
+
+    public ensure(func: (arg: T) => boolean): Ensurer<T>;   
+    public ensure(func: (arg: T) => boolean, reason: string): Ensurer<T>;
+    public ensure(func: (arg: T) => boolean, reason?: string): Ensurer<T>
+    {
+        if (func === null || func === undefined)
+            throw new ArgumentNullException("func");    
+        
+        if (this._arg == null || this._arg === undefined)
+            return this;
+        
+        if (!func(this._arg))
+        {
+            if (this._argName.toLowerCase() === "this")
+                throw new InvalidOperationException(reason != null && !reason.isEmptyOrWhiteSpace() ? reason.trim() : "current operation on instance");
+
+            throw reason != null && !reason.isEmptyOrWhiteSpace()
+                ? new ArgumentException(this._argName, reason.trim())
+                : new InvalidArgumentException(this._argName);
+        }
+
+        return this;
+    }
+    
     
     private ensureHasStructureInternal(arg: any, schema: any, parentName?: string)
     {
@@ -154,10 +179,10 @@ class EnsurerInternal<T> implements Ensurer<T>
             if (name.isEmptyOrWhiteSpace())
                 throw new ArgumentException("structure", `invalid key specification '${key}'`);
             let fullName = parentName ? `${parentName}.${name}` : name;
-            
+
             const typeInfo = schema[key];
             const typeName = this.getTypeNameInternal(typeInfo, fullName);
-            
+
             const value = arg[name];
             if (value === null || value === undefined)
             {
@@ -166,15 +191,15 @@ class EnsurerInternal<T> implements Ensurer<T>
 
                 throw new ArgumentException(this._argName, `is missing required property '${fullName}' of type '${typeName}'`);
             }
-            
+
             this.ensureHasTypeInternal(typeName, typeInfo, fullName, value);
-        } 
+        }
     }
-    
+
     private getTypeNameInternal(typeInfo: any, fullName: string): string
     {
         let types = ["string", "boolean", "number", "object", "array"];
-        
+
         if (typeInfo === null || typeInfo === undefined)
             throw new ArgumentException("structure", `null type specification for key '${fullName}'`);
 
@@ -184,10 +209,10 @@ class EnsurerInternal<T> implements Ensurer<T>
         const typeName = typeof (typeInfo) === "string" ? typeInfo.trim().toLowerCase() : Array.isArray(typeInfo) ? "array" : "object";
         if (types.every(t => t !== typeName))
             throw new ArgumentException("structure", `invalid type specification '${typeInfo}' for key '${fullName}'`);
-        
+
         return typeName;
     }
-    
+
     private ensureHasTypeInternal(typeName: string, typeInfo: any, fullName: string, value: any): void
     {
         if (typeName === "object")
@@ -227,26 +252,5 @@ class EnsurerInternal<T> implements Ensurer<T>
                 throw new ArgumentException(this._argName,
                     `invalid value of type '${typeof (value)}' for property '${fullName}' of type '${typeName}'`);
         }
-    }
-
-    public ensure(func: (arg: T) => boolean): Ensurer<T>;   
-    public ensure(func: (arg: T) => boolean, reason: string): Ensurer<T>;
-    public ensure(func: (arg: T) => boolean, reason?: string): Ensurer<T>
-    {
-        if (func === null || func === undefined)
-            throw new ArgumentNullException("func");    
-        
-        if (this._arg == null || this._arg === undefined)
-            return this;
-        
-        if (!func(this._arg))
-        {
-            if (reason != null && !reason.isEmptyOrWhiteSpace())
-                throw new ArgumentException(this._argName, reason.trim());
-
-            throw new InvalidArgumentException(this._argName);
-        }
-
-        return this;
     }
 }
