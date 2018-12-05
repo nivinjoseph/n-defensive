@@ -5,7 +5,7 @@ const n_exception_1 = require("@nivinjoseph/n-exception");
 function given(arg, argName) {
     if (argName == null || argName.isEmptyOrWhiteSpace())
         throw new n_exception_1.ArgumentNullException("argName");
-    return new EnsurerInternal(arg, argName);
+    return new EnsurerInternal(arg, argName.trim());
 }
 exports.given = given;
 class EnsurerInternal {
@@ -79,6 +79,20 @@ class EnsurerInternal {
         this.ensureHasStructureInternal(this._arg, structure);
         return this;
     }
+    ensure(func, reason) {
+        if (func === null || func === undefined)
+            throw new n_exception_1.ArgumentNullException("func");
+        if (this._arg == null || this._arg === undefined)
+            return this;
+        if (!func(this._arg)) {
+            if (this._argName.toLowerCase() === "this")
+                throw new n_exception_1.InvalidOperationException(reason != null && !reason.isEmptyOrWhiteSpace() ? reason.trim() : "current operation on instance");
+            throw reason != null && !reason.isEmptyOrWhiteSpace()
+                ? new n_exception_1.ArgumentException(this._argName, reason.trim())
+                : new n_exception_1.InvalidArgumentException(this._argName);
+        }
+        return this;
+    }
     ensureHasStructureInternal(arg, schema, parentName) {
         for (let key in schema) {
             let isOptional = key.endsWith("?");
@@ -134,18 +148,6 @@ class EnsurerInternal {
             if (typeof (value) !== typeName)
                 throw new n_exception_1.ArgumentException(this._argName, `invalid value of type '${typeof (value)}' for property '${fullName}' of type '${typeName}'`);
         }
-    }
-    ensure(func, reason) {
-        if (func === null || func === undefined)
-            throw new n_exception_1.ArgumentNullException("func");
-        if (this._arg == null || this._arg === undefined)
-            return this;
-        if (!func(this._arg)) {
-            if (reason != null && !reason.isEmptyOrWhiteSpace())
-                throw new n_exception_1.ArgumentException(this._argName, reason.trim());
-            throw new n_exception_1.InvalidArgumentException(this._argName);
-        }
-        return this;
     }
 }
 //# sourceMappingURL=index.js.map
