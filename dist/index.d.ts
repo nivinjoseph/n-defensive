@@ -1,28 +1,28 @@
 import "@nivinjoseph/n-ext";
 export interface Ensurer<T> {
-    ensureHasValue(): Ensurer<T>;
-    ensure(func: (arg: T) => boolean): Ensurer<T>;
-    ensure(func: (arg: T) => boolean, reason: string): Ensurer<T>;
+    ensureHasValue(): this;
+    ensure(func: (arg: T) => boolean): this;
+    ensure(func: (arg: T) => boolean, reason: string): this;
 }
 export interface StringEnsurer extends Ensurer<string> {
-    ensureIsString(): StringEnsurer;
+    ensureIsString(): this;
 }
 export interface NumberEnsurer extends Ensurer<number> {
-    ensureIsNumber(): NumberEnsurer;
+    ensureIsNumber(): this;
 }
 export interface BooleanEnsurer extends Ensurer<boolean> {
-    ensureIsBoolean(): BooleanEnsurer;
+    ensureIsBoolean(): this;
 }
 export interface ArrayEnsurer extends Ensurer<Array<any>> {
-    ensureIsArray(): ArrayEnsurer;
+    ensureIsArray(): this;
 }
 export interface FunctionEnsurer extends Ensurer<Function> {
-    ensureIsFunction(): FunctionEnsurer;
+    ensureIsFunction(): this;
 }
 export interface ObjectEnsurer extends Ensurer<object> {
-    ensureIsObject(): ObjectEnsurer;
-    ensureIsType(type: Function): ObjectEnsurer;
-    ensureHasStructure(structure: object): ObjectEnsurer;
+    ensureIsObject(): this;
+    ensureIsType(type: Function): this;
+    ensureHasStructure(structure: object): this;
 }
 declare function given(arg: string, argName: string): StringEnsurer;
 declare function given(arg: number, argName: string): NumberEnsurer;
