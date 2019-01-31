@@ -10,25 +10,64 @@ import
 export interface Ensurer<T>
 {
     ensureHasValue(): Ensurer<T>;
-    ensureIsString(): Ensurer<T>;
-    ensureIsNumber(): Ensurer<T>;
-    ensureIsBoolean(): Ensurer<T>;
-    ensureIsObject(): Ensurer<T>;
-    ensureIsFunction(): Ensurer<T>;
-    ensureIsArray(): Ensurer<T>;
-    ensureIsType(type: Function): Ensurer<T>;
-    ensureHasStructure(structure: object): Ensurer<T>;
     ensure(func: (arg: T) => boolean): Ensurer<T>;
     ensure(func: (arg: T) => boolean, reason: string): Ensurer<T>;
+    
+        // ensureIsString(): Ensurer<T>;
+        // ensureIsNumber(): Ensurer<T>;
+        // ensureIsBoolean(): Ensurer<T>;
+        // ensureIsObject(): Ensurer<T>;
+        // ensureIsFunction(): Ensurer<T>;
+        // ensureIsArray(): Ensurer<T>;
+        // ensureIsType(type: Function): Ensurer<T>;
+        // ensureHasStructure(structure: object): Ensurer<T>;
 }  
 
-export function given<T>(arg: T, argName: string): Ensurer<T>
+export interface StringEnsurer extends Ensurer<string>
+{
+    ensureIsString(): StringEnsurer;
+}
+export interface NumberEnsurer extends Ensurer<number>
+{
+    ensureIsNumber(): NumberEnsurer;
+}
+export interface BooleanEnsurer extends Ensurer<boolean>
+{
+    ensureIsBoolean(): BooleanEnsurer;
+}
+export interface ArrayEnsurer extends Ensurer<Array<any>>
+{
+    ensureIsArray(): ArrayEnsurer;
+}
+export interface FunctionEnsurer extends Ensurer<Function>
+{
+    ensureIsFunction(): FunctionEnsurer;
+}
+export interface ObjectEnsurer extends Ensurer<object>
+{
+    ensureIsObject(): ObjectEnsurer;
+    ensureIsType(type: Function): ObjectEnsurer;
+    ensureHasStructure(structure: object): ObjectEnsurer;
+}
+
+
+function given(arg: string, argName: string): StringEnsurer;
+function given(arg: number, argName: string): NumberEnsurer;
+function given(arg: boolean, argName: string): BooleanEnsurer;
+function given(arg: Array<any>, argName: string): ArrayEnsurer;
+function given(arg: Function, argName: string): FunctionEnsurer;
+function given(arg: object, argName: string): ObjectEnsurer;
+function given<T, U extends Ensurer<T>>(arg: T, argName: string): U;
+function given<T, U extends Ensurer<T>>(arg: T, argName: string): U
 {
     if (argName == null || argName.isEmptyOrWhiteSpace())
         throw new ArgumentNullException("argName");
     
-    return new EnsurerInternal(arg, argName.trim());
+    return new EnsurerInternal(arg, argName.trim()) as any;
 }
+
+export { given } ;
+
 
 class EnsurerInternal<T> implements Ensurer<T>
 {

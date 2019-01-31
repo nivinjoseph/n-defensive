@@ -5,16 +5,16 @@ import { Exception, ArgumentException } from "@nivinjoseph/n-exception";
 
 suite("Exceptions thrown", () =>
 {
-    let arg: any;
-    let argName: any;
+    // let arg: any;
+    // let argName: any;
     let exceptionHappened: boolean;
     let exceptionType: string;
     let reason: any;
 
     setup(() =>
     {
-        arg = null;
-        argName = null;
+        // arg = null;
+        // argName = null;
         exceptionHappened = false;
         reason = null;
     });
@@ -22,10 +22,10 @@ suite("Exceptions thrown", () =>
     suite("given", () =>
     {
         test("should throw an ArgumentNullException if argName (second arg) is null", () => 
-        {
+        {   
             try 
             {
-                given(arg, argName);
+                given(null, null as any);
             }
             catch (exp)
             {
@@ -38,10 +38,10 @@ suite("Exceptions thrown", () =>
 
         test("should throw an ArgumentNullException if argName (second arg) is undefined", () =>
         {
-            argName = undefined;
+            // argName = undefined;
             try 
             {
-                given(arg, argName);
+                given(null, undefined as any);
             }
             catch (exp)
             {
@@ -54,10 +54,10 @@ suite("Exceptions thrown", () =>
 
         test("should throw an ArgumentNullException if argName (second arg) is an empty string", () =>
         {
-            argName = "";
+            // argName = "";
             try 
             {
-                given(arg, argName);
+                given(null, "");
             }
             catch (exp)
             {
@@ -70,10 +70,10 @@ suite("Exceptions thrown", () =>
 
         test("should throw an ArgumentNullException if argName (second arg) is an whitespace string", () =>
         {
-            argName = "  ";
+            // argName = "  ";
             try 
             {
-                given(arg, argName);
+                given(null, "  ");
             }
             catch (exp)
             {
@@ -86,16 +86,16 @@ suite("Exceptions thrown", () =>
 
         test("given should return an Ensurer object", () =>
         {
-            let ensurer = given({}, "argName");
-            try 
-            {
-                given(arg, argName);
-            }
-            catch (exp)
-            {
-                exceptionHappened = true;
-                exceptionType = (<Object>exp).getTypeName();
-            }
+            const ensurer = given({}, "argName");
+            // try 
+            // {
+            //     given(arg, argName);
+            // }
+            // catch (exp)
+            // {
+            //     exceptionHappened = true;
+            //     exceptionType = (<Object>exp).getTypeName();
+            // }
             assert.ok(ensurer != null);
         });
     });
@@ -106,7 +106,7 @@ suite("Exceptions thrown", () =>
         {
             try 
             {
-                given(arg, argName).ensureHasValue();
+                given(null, "argName").ensureHasValue();
             }
             catch (exp)
             {
@@ -119,10 +119,10 @@ suite("Exceptions thrown", () =>
 
         test("should throw ArgumentNullException if arg is undefined", () =>
         {
-            arg = undefined;
+            // arg = undefined;
             try 
             {
-                given(arg, argName).ensureHasValue();
+                given(undefined, "argName").ensureHasValue();
             }
             catch (exp)
             {
@@ -135,11 +135,11 @@ suite("Exceptions thrown", () =>
         
         test("should throw ArgumentException if arg is empty string", () =>
         {
-            arg = "";
-            argName = "argName";
+            // arg = "";
+            // argName = "argName";
             try 
             {
-                given(arg, argName).ensureHasValue();
+                given("", "argName").ensureHasValue();
             }
             catch (exp)
             {
@@ -152,11 +152,11 @@ suite("Exceptions thrown", () =>
         
         test("should throw ArgumentException if arg is whitespace string", () =>
         {
-            arg = "   ";
-            argName = "argName";
+            // arg = "   ";
+            // argName = "argName";
             try 
             {
-                given(arg, argName).ensureHasValue();
+                given("   ", "argName").ensureHasValue();
             }
             catch (exp)
             {
@@ -169,11 +169,11 @@ suite("Exceptions thrown", () =>
 
         test("should not throw any exceptions if arg has value", () =>
         {
-            arg = "arg";
-            argName = "argName";
+            // arg = "arg";
+            // argName = "argName";
             try 
             {
-                given(arg, argName).ensureHasValue();
+                given("arg", "argName").ensureHasValue();
             }
             catch (exp)
             {
@@ -188,7 +188,7 @@ suite("Exceptions thrown", () =>
     {
         test("should be fine if the value is string", () =>
         {
-            let value = "foo";
+            const value = "foo";
             given(value, "value").ensureIsString();
             assert.ok(true);
         });
@@ -197,7 +197,7 @@ suite("Exceptions thrown", () =>
         {
             try 
             {
-                let value = {};
+                const value: string = {} as any;
                 given(value, "value").ensureIsString();
                 assert.ok(false);
             }
@@ -221,7 +221,7 @@ suite("Exceptions thrown", () =>
         {
             try 
             {
-                let value = "5";
+                const value: number = "5" as any;
                 given(value, "value").ensureIsNumber();
                 assert.ok(false);
             }
@@ -236,7 +236,7 @@ suite("Exceptions thrown", () =>
     {
         test("should be fine if the value is boolean", () =>
         {
-            let value = false;
+            const value = false;
             given(value, "value").ensureIsBoolean();
             assert.ok(true);
         });
@@ -245,7 +245,7 @@ suite("Exceptions thrown", () =>
         {
             try 
             {
-                let value = "true";
+                const value: boolean = "true" as any;
                 given(value, "value").ensureIsBoolean();
                 assert.ok(false);
             }
@@ -269,7 +269,7 @@ suite("Exceptions thrown", () =>
         {
             try 
             {
-                let value = "foo";
+                const value: object = "foo" as any;
                 given(value, "value").ensureIsObject();
                 assert.ok(false);
             }
@@ -284,7 +284,7 @@ suite("Exceptions thrown", () =>
     {
         test("should be fine if the value is function", () =>
         {
-            let value = () => "foo";
+            const value = () => "foo";
             given(value, "value").ensureIsFunction();
             assert.ok(true);
         });
@@ -293,7 +293,7 @@ suite("Exceptions thrown", () =>
         {
             try 
             {
-                let value = {};
+                const value: Function = {} as any;
                 given(value, "value").ensureIsFunction();
                 assert.ok(false);
             }
@@ -308,7 +308,7 @@ suite("Exceptions thrown", () =>
     {
         test("should be fine if the value is array", () =>
         {
-            let value = ["foo"];
+            const value = ["foo"];
             given(value, "value").ensureIsArray();
             assert.ok(true);
         });
@@ -317,7 +317,7 @@ suite("Exceptions thrown", () =>
         {
             try 
             {
-                let value = {};
+                const value: Array<any> = {} as any;
                 given(value, "value").ensureIsArray();
                 assert.ok(false);
             }
@@ -385,7 +385,7 @@ suite("Exceptions thrown", () =>
         // op* = optional
         // nes* = nested
         
-        let obj: any = {
+        let obj: object = {
             strVal: "foo", // good
             inStrVal: true, // bad
             neStrVal: null, // bad
@@ -479,7 +479,7 @@ suite("Exceptions thrown", () =>
         
         test("should be fine if arg is null", () =>
         {
-            let arg = null;
+            let arg: object = null as any;
             let structure = {};
             
             given(arg, "arg").ensureHasStructure(structure);
@@ -489,7 +489,7 @@ suite("Exceptions thrown", () =>
         
         test("should be fine if arg is undefined", () =>
         {
-            let arg = undefined;
+            let arg: object = undefined as any;
             let structure = {};
 
             given(arg, "arg").ensureHasStructure(structure);
@@ -1337,17 +1337,20 @@ suite("Exceptions thrown", () =>
 
     suite("ensure", () =>
     {
+        const arg = "arg";
+        const argName = "argName";
+        
         setup(() =>
         {
-            arg = "arg";
-            argName = "argName";
+            // arg = "arg";
+            // argName = "argName";
         });
 
         test("should throw ArgumentNullException if func is null", () =>
         {
             try 
             {
-                given(arg, argName).ensure(null, "reason");
+                given(arg, argName).ensure(null as any, "reason");
             }
             catch (exp)
             {
@@ -1362,7 +1365,7 @@ suite("Exceptions thrown", () =>
         {
             try 
             {
-                given(arg, argName).ensure(undefined, "reason");
+                given(arg, argName).ensure(undefined as any, "reason");
             }
             catch (exp)
             {
@@ -1377,8 +1380,9 @@ suite("Exceptions thrown", () =>
         {
             try 
             {
-                // @ts-ignore
-                given(arg, argName).ensure(arg => false);
+                given(arg, argName)
+                    // @ts-ignore
+                    .ensure(arg => false);
             }
             catch (exp)
             {
@@ -1393,8 +1397,9 @@ suite("Exceptions thrown", () =>
         {
             try 
             {
-                // @ts-ignore
-                given(arg, argName).ensure(arg => true, "reason");
+                given(arg, argName)
+                    // @ts-ignore
+                    .ensure(arg => true, "reason");
             }
             catch (exp)
             {
@@ -1407,10 +1412,12 @@ suite("Exceptions thrown", () =>
 
     suite("ensure with reason", () =>
     {
+        const arg = "arg";
+        const argName = "argName";
+        
         setup(() =>
         {
-            arg = "arg";
-            argName = "argName";
+            
         });
 
         test("should throw InvalidArgumentException if func returns false and reason is null", () =>
