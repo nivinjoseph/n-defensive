@@ -186,6 +186,8 @@ suite("Exceptions thrown", () =>
 
     suite("ensureIsString", () =>
     {
+        // TODO: check this
+        
         test("should be fine if the value is string", () =>
         {
             const value = "foo";

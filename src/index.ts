@@ -9,9 +9,9 @@ import
 
 export interface Ensurer<T>
 {
-    ensureHasValue(): Ensurer<T>;
-    ensure(func: (arg: T) => boolean): Ensurer<T>;
-    ensure(func: (arg: T) => boolean, reason: string): Ensurer<T>;
+    ensureHasValue(): this;
+    ensure(func: (arg: T) => boolean): this;
+    ensure(func: (arg: T) => boolean, reason: string): this;
     
         // ensureIsString(): Ensurer<T>;
         // ensureIsNumber(): Ensurer<T>;
@@ -25,29 +25,29 @@ export interface Ensurer<T>
 
 export interface StringEnsurer extends Ensurer<string>
 {
-    ensureIsString(): StringEnsurer;
+    ensureIsString(): this;
 }
 export interface NumberEnsurer extends Ensurer<number>
 {
-    ensureIsNumber(): NumberEnsurer;
+    ensureIsNumber(): this;
 }
 export interface BooleanEnsurer extends Ensurer<boolean>
 {
-    ensureIsBoolean(): BooleanEnsurer;
+    ensureIsBoolean(): this;
 }
 export interface ArrayEnsurer extends Ensurer<Array<any>>
 {
-    ensureIsArray(): ArrayEnsurer;
+    ensureIsArray(): this;
 }
 export interface FunctionEnsurer extends Ensurer<Function>
 {
-    ensureIsFunction(): FunctionEnsurer;
+    ensureIsFunction(): this;
 }
 export interface ObjectEnsurer extends Ensurer<object>
 {
-    ensureIsObject(): ObjectEnsurer;
-    ensureIsType(type: Function): ObjectEnsurer;
-    ensureHasStructure(structure: object): ObjectEnsurer;
+    ensureIsObject(): this;
+    ensureIsType(type: Function): this;
+    ensureHasStructure(structure: object): this;
 }
 
 
@@ -81,7 +81,7 @@ class EnsurerInternal<T> implements Ensurer<T>
         this._argName = argName;
     }
 
-    public ensureHasValue(): Ensurer<T>
+    public ensureHasValue(): this
     {
         if (this._arg === null || this._arg === undefined)
             throw new ArgumentNullException(this._argName);
@@ -92,7 +92,7 @@ class EnsurerInternal<T> implements Ensurer<T>
         return this;
     }
     
-    public ensureIsString(): Ensurer<T>
+    public ensureIsString(): this
     {
         if (this._arg === null || this._arg === undefined)
             return this;
@@ -103,7 +103,7 @@ class EnsurerInternal<T> implements Ensurer<T>
         return this;
     }
     
-    public ensureIsNumber(): Ensurer<T>
+    public ensureIsNumber(): this
     {
         if (this._arg === null || this._arg === undefined)
             return this;
@@ -114,7 +114,7 @@ class EnsurerInternal<T> implements Ensurer<T>
         return this;
     }
     
-    public ensureIsBoolean(): Ensurer<T>
+    public ensureIsBoolean(): this
     {
         if (this._arg === null || this._arg === undefined)
             return this;
@@ -125,7 +125,7 @@ class EnsurerInternal<T> implements Ensurer<T>
         return this;
     }
     
-    public ensureIsObject(): Ensurer<T>
+    public ensureIsObject(): this
     {
         if (this._arg === null || this._arg === undefined)
             return this;
@@ -136,7 +136,7 @@ class EnsurerInternal<T> implements Ensurer<T>
         return this;
     }
     
-    public ensureIsFunction(): Ensurer<T>
+    public ensureIsFunction(): this
     {
         if (this._arg === null || this._arg === undefined)
             return this;
@@ -147,7 +147,7 @@ class EnsurerInternal<T> implements Ensurer<T>
         return this;
     }
     
-    public ensureIsArray(): Ensurer<T>
+    public ensureIsArray(): this
     {
         if (this._arg === null || this._arg === undefined)
             return this;
@@ -158,7 +158,7 @@ class EnsurerInternal<T> implements Ensurer<T>
         return this;
     }
     
-    public ensureIsType(type: Function): Ensurer<T>
+    public ensureIsType(type: Function): this
     {
         if (type === null || type === undefined)
             throw new ArgumentNullException("type");
@@ -172,7 +172,7 @@ class EnsurerInternal<T> implements Ensurer<T>
         return this;
     }
     
-    public ensureHasStructure(structure: object): Ensurer<T>
+    public ensureHasStructure(structure: object): this
     {
         if (structure === null || structure === undefined)
             throw new ArgumentNullException("structure");
@@ -185,9 +185,9 @@ class EnsurerInternal<T> implements Ensurer<T>
         return this;
     }
 
-    public ensure(func: (arg: T) => boolean): Ensurer<T>;   
-    public ensure(func: (arg: T) => boolean, reason: string): Ensurer<T>;
-    public ensure(func: (arg: T) => boolean, reason?: string): Ensurer<T>
+    public ensure(func: (arg: T) => boolean): this;   
+    public ensure(func: (arg: T) => boolean, reason: string): this;
+    public ensure(func: (arg: T) => boolean, reason?: string): this
     {
         if (func === null || func === undefined)
             throw new ArgumentNullException("func");    
