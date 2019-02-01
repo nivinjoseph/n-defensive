@@ -35,7 +35,7 @@ export interface BooleanEnsurer extends Ensurer<boolean>
 {
     ensureIsBoolean(): this;
 }
-export interface ArrayEnsurer extends Ensurer<Array<any>>
+export interface ArrayEnsurer<TItem> extends Ensurer<ReadonlyArray<TItem>>
 {
     ensureIsArray(): this;
 }
@@ -43,7 +43,7 @@ export interface FunctionEnsurer extends Ensurer<Function>
 {
     ensureIsFunction(): this;
 }
-export interface ObjectEnsurer extends Ensurer<object>
+export interface ObjectEnsurer<T extends object> extends Ensurer<T>
 {
     ensureIsObject(): this;
     ensureIsType(type: Function): this;
@@ -54,9 +54,9 @@ export interface ObjectEnsurer extends Ensurer<object>
 function given(arg: string, argName: string): StringEnsurer;
 function given(arg: number, argName: string): NumberEnsurer;
 function given(arg: boolean, argName: string): BooleanEnsurer;
-function given(arg: Array<any>, argName: string): ArrayEnsurer;
+function given<TItem>(arg: ReadonlyArray<TItem>, argName: string): ArrayEnsurer<TItem>;
 function given(arg: Function, argName: string): FunctionEnsurer;
-function given(arg: object, argName: string): ObjectEnsurer;
+function given<T extends object>(arg: T, argName: string): ObjectEnsurer<T>;
 function given<T, U extends Ensurer<T>>(arg: T, argName: string): U;
 function given<T, U extends Ensurer<T>>(arg: T, argName: string): U
 {

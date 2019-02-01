@@ -333,7 +333,14 @@ suite("Exceptions thrown", () =>
     suite("ensureIsType", () =>
     {
         class Foo { }
-        class Bar { }
+        class Bar
+        { 
+            public baz: string;
+            public constructor()
+            {
+                this.baz = "I am baz";
+            }
+        }
         class Foo2 extends Foo { }    
 
 
