@@ -6,9 +6,11 @@ export interface Ensurer<T> {
 }
 export interface StringEnsurer extends Ensurer<string> {
     ensureIsString(): this;
+    ensureIsEnum(enumType: object): this;
 }
 export interface NumberEnsurer extends Ensurer<number> {
     ensureIsNumber(): this;
+    ensureIsEnum(enumType: object): this;
 }
 export interface BooleanEnsurer extends Ensurer<boolean> {
     ensureIsBoolean(): this;

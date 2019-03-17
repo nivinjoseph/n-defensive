@@ -34,6 +34,18 @@ class EnsurerInternal {
             throw new n_exception_1.ArgumentException(this._argName, "must be number");
         return this;
     }
+    ensureIsEnum(enumType) {
+        if (enumType == null || typeof (enumType) !== "object")
+            throw new n_exception_1.InvalidArgumentException("enumType");
+        if (this._arg === null || this._arg === undefined)
+            return this;
+        if (typeof (this._arg) !== "number" && typeof (this._arg) !== "string")
+            throw new n_exception_1.ArgumentException(this._argName, "must be a valid enum value");
+        const values = this.getEnumValues(enumType);
+        if (!values.contains(this._arg))
+            throw new n_exception_1.ArgumentException(this._argName, "is not a valid enum value");
+        return this;
+    }
     ensureIsBoolean() {
         if (this._arg === null || this._arg === undefined)
             return this;
@@ -148,6 +160,23 @@ class EnsurerInternal {
             if (typeof (value) !== typeName)
                 throw new n_exception_1.ArgumentException(this._argName, `invalid value of type '${typeof (value)}' for property '${fullName}' of type '${typeName}'`);
         }
+    }
+    isNumber(value) {
+        if (value == null)
+            return false;
+        value = value.toString().trim();
+        if (value.length === 0)
+            return false;
+        let parsed = +value.toString().trim();
+        return !isNaN(parsed) && isFinite(parsed);
+    }
+    getEnumValues(enumType) {
+        const keys = Object.keys(enumType);
+        if (keys.length === 0)
+            return [];
+        if (this.isNumber(keys[0]))
+            return keys.filter(t => this.isNumber(t)).map(t => +t);
+        return keys.map(t => enumType[t]);
     }
 }
 //# sourceMappingURL=index.js.map
