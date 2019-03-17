@@ -26,10 +26,12 @@ export interface Ensurer<T>
 export interface StringEnsurer extends Ensurer<string>
 {
     ensureIsString(): this;
+    ensureIsEnum(enumType: object): this;
 }
 export interface NumberEnsurer extends Ensurer<number>
 {
     ensureIsNumber(): this;
+    ensureIsEnum(enumType: object): this;
 }
 export interface BooleanEnsurer extends Ensurer<boolean>
 {
@@ -111,6 +113,24 @@ class EnsurerInternal<T> implements Ensurer<T>
         if (typeof (this._arg) !== "number")
             throw new ArgumentException(this._argName, "must be number");
 
+        return this;
+    }
+    
+    public ensureIsEnum(enumType: object): this
+    {
+        if (enumType == null || typeof (enumType) !== "object")
+            throw new InvalidArgumentException("enumType");
+        
+        if (this._arg === null || this._arg === undefined)
+            return this;
+        
+        if (typeof (this._arg) !== "number" && typeof(this._arg) !== "string")
+            throw new ArgumentException(this._argName, "must be a valid enum value");
+        
+        const values = this.getEnumValues(enumType);
+        if (!values.contains(this._arg))
+            throw new ArgumentException(this._argName, "is not a valid enum value");
+        
         return this;
     }
     
@@ -291,5 +311,29 @@ class EnsurerInternal<T> implements Ensurer<T>
                 throw new ArgumentException(this._argName,
                     `invalid value of type '${typeof (value)}' for property '${fullName}' of type '${typeName}'`);
         }
+    }
+    
+    private isNumber(value: any): boolean
+    {
+        if (value == null)
+            return false;
+        
+        value = value.toString().trim();
+        if (value.length === 0)
+            return false;
+        let parsed = +value.toString().trim();
+        return !isNaN(parsed) && isFinite(parsed);
+    }
+
+    private getEnumValues(enumType: object): ReadonlyArray<any>
+    {
+        const keys = Object.keys(enumType);
+        if (keys.length === 0)
+            return [];
+
+        if (this.isNumber(keys[0]))
+            return keys.filter(t => this.isNumber(t)).map(t => +t);
+
+        return keys.map(t => (<any>enumType)[t]);
     }
 }

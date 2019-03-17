@@ -233,6 +233,57 @@ suite("Exceptions thrown", () =>
             }
         });
     });
+    
+    suite("ensureIsEnum", () =>
+    {
+        enum Foo
+        {
+            bar,
+            baz = 2,
+            maa = "something",
+            ano = 3
+        }
+
+        enum Bar
+        {
+            foo = "my foo",
+            baz = "my baz"
+        }
+        
+        test("should work", () =>
+        {
+            
+            const validNumArg = Foo.bar;
+            const invalidNumArg = 5;
+            let numExpThrown = false;
+            
+            const validStringArg = "my foo";
+            const invalidStringArg = "my bruh";
+            let stringExpThrown = false;
+            
+            given(validNumArg, "validNumArg").ensureHasValue().ensureIsNumber().ensureIsEnum(Foo);
+            try 
+            {
+                given(invalidNumArg, "invalidNumArg").ensureHasValue().ensureIsNumber().ensureIsEnum(Foo);    
+            }
+            catch (error)
+            {
+                numExpThrown = true;
+            }          
+            assert.ok(numExpThrown);
+            
+            given(validStringArg, "validStringArg").ensureHasValue().ensureIsString().ensureIsEnum(Bar);
+            try
+            {    
+                given(invalidStringArg, "invalidStringArg").ensureHasValue().ensureIsString().ensureIsEnum(Bar);   
+            }
+            catch (error)
+            {
+                stringExpThrown = true;
+            }
+            assert.ok(stringExpThrown);
+        });
+    });
 
     suite("ensureIsBoolean", () =>
     {
@@ -1501,8 +1552,7 @@ suite("Exceptions thrown", () =>
             reason = "reason";
             try 
             {
-                // @ts-ignore
-                given(arg, argName).ensure(arg => false, reason);
+                given(arg, argName).ensure(_ => false, reason);
             }
             catch (exp)
             {
