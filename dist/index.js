@@ -79,8 +79,18 @@ class EnsurerInternal {
             throw new n_exception_1.ArgumentNullException("type");
         if (this._arg == null || this._arg === undefined)
             return this;
+        const typeName = type.getTypeName();
+        if (this._arg.getTypeName() !== typeName)
+            throw new n_exception_1.ArgumentException(this._argName, `must be of type ${typeName}`);
+        return this;
+    }
+    ensureIsInstanceOf(type) {
+        if (type === null || type === undefined)
+            throw new n_exception_1.ArgumentNullException("type");
+        if (this._arg == null || this._arg === undefined)
+            return this;
         if (!(this._arg instanceof type))
-            throw new n_exception_1.ArgumentException(this._argName, `must be ${type.getTypeName()}`);
+            throw new n_exception_1.ArgumentException(this._argName, `must be instance of ${type.getTypeName()}`);
         return this;
     }
     ensureHasStructure(structure) {
