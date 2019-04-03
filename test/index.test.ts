@@ -402,11 +402,18 @@ suite("Exceptions thrown", () =>
             assert.ok(true);
         });
         
-        test("should be fine if value is subclass of type", () =>
+        test("should throw exception if value is subclass of type", () =>
         {
-            let value = new Foo2();
-            given(value, "value").ensureIsType(Foo);
-            assert.ok(true);
+            try 
+            {
+                let value = new Foo2();
+                given(value, "value").ensureIsType(Foo);
+                assert.ok(false);    
+            }
+            catch (error)
+            {
+                assert.ok(error instanceof ArgumentException);
+            }
         });
         
         test("should throw ArgumentException if the value is not of correct type", () =>
@@ -415,6 +422,63 @@ suite("Exceptions thrown", () =>
             {
                 let value = new Bar();
                 given(value, "value").ensureIsType(Foo);
+                assert.ok(false);
+            }
+            catch (error)
+            {
+                assert.ok(error instanceof ArgumentException);
+            }
+        });
+
+        test("should throw ArgumentException if the value is superclass of type", () =>
+        {
+            try 
+            {
+                let value = new Foo();
+                given(value, "value").ensureIsType(Foo2);
+                assert.ok(false);
+            }
+            catch (error)
+            {
+                assert.ok(error instanceof ArgumentException);
+            }
+        });
+    });
+    
+    suite("ensureIsInstanceOf", () =>
+    {
+        class Foo { }
+        class Bar
+        {
+            public baz: string;
+            public constructor()
+            {
+                this.baz = "I am baz";
+            }
+        }
+        class Foo2 extends Foo { }
+
+
+        test("should be fine if the value is of correct type", () =>
+        {
+            let value = new Foo();
+            given(value, "value").ensureIsInstanceOf(Foo);
+            assert.ok(true);
+        });
+
+        test("should be fine if value is subclass of type", () =>
+        {
+            let value = new Foo2();
+            given(value, "value").ensureIsInstanceOf(Foo);
+            assert.ok(true);
+        });
+
+        test("should throw ArgumentException if the value is not of correct type", () =>
+        {
+            try 
+            {
+                let value = new Bar();
+                given(value, "value").ensureIsInstanceOf(Foo);
                 assert.ok(false);
             }
             catch (error)

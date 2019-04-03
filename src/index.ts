@@ -7,6 +7,7 @@ import
     InvalidOperationException,
 } from "@nivinjoseph/n-exception";
 
+
 export interface Ensurer<T>
 {
     ensureHasValue(): this;
@@ -49,6 +50,7 @@ export interface ObjectEnsurer<T extends object> extends Ensurer<T>
 {
     ensureIsObject(): this;
     ensureIsType(type: Function): this;
+    ensureIsInstanceOf(type: Function): this;
     ensureHasStructure(structure: object): this;
 }
 
@@ -186,9 +188,24 @@ class EnsurerInternal<T> implements Ensurer<T>
         if (this._arg == null || this._arg === undefined)
             return this;
         
-        if (!(this._arg instanceof type))
-            throw new ArgumentException(this._argName, `must be ${(<Object>type).getTypeName()}`);
+        const typeName = (<Object>type).getTypeName();
+        if ((<Object>this._arg).getTypeName() !== typeName)
+            throw new ArgumentException(this._argName, `must be of type ${typeName}`);
         
+        return this;
+    }
+    
+    public ensureIsInstanceOf(type: Function): this
+    {
+        if (type === null || type === undefined)
+            throw new ArgumentNullException("type");
+
+        if (this._arg == null || this._arg === undefined)
+            return this;
+
+        if (!(this._arg instanceof type))
+            throw new ArgumentException(this._argName, `must be instance of ${(<Object>type).getTypeName()}`);
+
         return this;
     }
     
