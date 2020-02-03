@@ -24,7 +24,7 @@ export interface FunctionEnsurer extends Ensurer<Function> {
 export interface ObjectEnsurer<T extends object> extends Ensurer<T> {
     ensureIsObject(): this;
     ensureIsType(type: new (...args: any[]) => T): this;
-    ensureIsInstanceOf<U extends T>(type: new (...args: any[]) => U): this;
+    ensureIsInstanceOf(type: new (...args: any[]) => T): this;
     ensureHasStructure(structure: object): this;
 }
 declare function given(arg: string, argName: string): StringEnsurer;
