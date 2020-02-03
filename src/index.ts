@@ -50,7 +50,7 @@ export interface ObjectEnsurer<T extends object> extends Ensurer<T>
 {
     ensureIsObject(): this;
     ensureIsType(type: new (...args: any[]) => T): this;
-    ensureIsInstanceOf(type: new (...args: any[]) => T): this;
+    ensureIsInstanceOf<U extends T>(type: new (...args: any[]) => T | U): this;
     ensureHasStructure(structure: object): this;
 }
 
