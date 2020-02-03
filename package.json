@@ -40,6 +40,6 @@
     },
     "dependencies": {
         "@nivinjoseph/n-exception": "^1.0.19",
-        "@nivinjoseph/n-ext": "^1.1.10"
+        "@nivinjoseph/n-ext": "^1.1.13"
     }
 }

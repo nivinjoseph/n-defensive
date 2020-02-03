@@ -421,7 +421,7 @@ suite("Exceptions thrown", () =>
             try 
             {
                 let value = new Bar();
-                given(value, "value").ensureIsType(Foo);
+                given(value, "value").ensureIsType(Foo as any);
                 assert.ok(false);
             }
             catch (error)
@@ -478,7 +478,7 @@ suite("Exceptions thrown", () =>
             try 
             {
                 let value = new Bar();
-                given(value, "value").ensureIsInstanceOf(Foo);
+                given(value, "value").ensureIsInstanceOf(Foo as any);
                 assert.ok(false);
             }
             catch (error)
