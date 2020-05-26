@@ -115,6 +115,9 @@ class EnsurerInternal<T> implements Ensurer<T>
         if (typeof (this._arg) !== "number")
             throw new ArgumentException(this._argName, "must be number");
 
+        if (!this.isNumber(this._arg))
+            throw new ArgumentException(this._argName, "must be number");
+        
         return this;
     }
     

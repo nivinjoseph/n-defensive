@@ -232,6 +232,21 @@ suite("Exceptions thrown", () =>
                 assert.ok(error instanceof ArgumentException);
             }
         });
+        
+        test("should throw ArgumentException if the value evaluates to NaN", () =>
+        {
+            try 
+            {
+                const value: number = (undefined as any) + 1;
+                // console.log(value);
+                given(value, "value").ensureIsNumber();
+                assert.ok(false);
+            }
+            catch (error)
+            {
+                assert.ok(error instanceof ArgumentException);
+            }
+        });
     });
     
     suite("ensureIsEnum", () =>
