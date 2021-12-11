@@ -1,33 +1,35 @@
 import "@nivinjoseph/n-ext";
 export interface Ensurer<T> {
-    ensureHasValue(): this;
+    ensureHasValue(when?: boolean | (() => boolean)): this;
     ensure(func: (arg: T) => boolean): this;
     ensure(func: (arg: T) => boolean, reason: string): this;
+    ensureWhen(when: boolean | (() => boolean), func: (arg: T) => boolean): this;
+    ensureWhen(when: boolean | (() => boolean), func: (arg: T) => boolean, reason: string): this;
 }
 export interface StringEnsurer extends Ensurer<string> {
-    ensureIsString(): this;
-    ensureIsEnum(enumType: object): this;
+    ensureIsString(when?: boolean | (() => boolean)): this;
+    ensureIsEnum(enumType: object, when?: boolean | (() => boolean)): this;
 }
 export interface NumberEnsurer extends Ensurer<number> {
-    ensureIsNumber(): this;
-    ensureIsEnum(enumType: object): this;
+    ensureIsNumber(when?: boolean | (() => boolean)): this;
+    ensureIsEnum(enumType: object, when?: boolean | (() => boolean)): this;
 }
 export interface BooleanEnsurer extends Ensurer<boolean> {
-    ensureIsBoolean(): this;
+    ensureIsBoolean(when?: boolean | (() => boolean)): this;
 }
 export interface ArrayEnsurer<TItem> extends Ensurer<ReadonlyArray<TItem>> {
-    ensureIsArray(): this;
+    ensureIsArray(when?: boolean | (() => boolean)): this;
 }
 export interface FunctionEnsurer extends Ensurer<Function> {
-    ensureIsFunction(): this;
+    ensureIsFunction(when?: boolean | (() => boolean)): this;
 }
 export interface ObjectEnsurer<T extends object> extends Ensurer<T> {
-    ensureIsObject(): this;
-    ensureIsType(type: new (...args: any[]) => T): this;
+    ensureIsObject(when?: boolean | (() => boolean)): this;
+    ensureIsType(type: new (...args: any[]) => T, when?: boolean | (() => boolean)): this;
     ensureIsInstanceOf(type: Function & {
         prototype: T;
-    }): this;
-    ensureHasStructure(structure: object): this;
+    }, when?: boolean | (() => boolean)): this;
+    ensureHasStructure(structure: object, when?: boolean | (() => boolean)): this;
 }
 declare function given(arg: string, argName: string): StringEnsurer;
 declare function given(arg: number, argName: string): NumberEnsurer;

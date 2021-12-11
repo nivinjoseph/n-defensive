@@ -14,21 +14,27 @@ class EnsurerInternal {
         this._arg = arg;
         this._argName = argName;
     }
-    ensureHasValue() {
+    ensureHasValue(when) {
+        if (!this._canExecute(when))
+            return this;
         if (this._arg === null || this._arg === undefined)
             throw new n_exception_1.ArgumentNullException(this._argName);
         if (typeof (this._arg) === "string" && this._arg.isEmptyOrWhiteSpace())
             throw new n_exception_1.ArgumentException(this._argName, "string value cannot be empty or whitespace");
         return this;
     }
-    ensureIsString() {
+    ensureIsString(when) {
+        if (!this._canExecute(when))
+            return this;
         if (this._arg === null || this._arg === undefined)
             return this;
         if (typeof (this._arg) !== "string")
             throw new n_exception_1.ArgumentException(this._argName, "must be string");
         return this;
     }
-    ensureIsNumber() {
+    ensureIsNumber(when) {
+        if (!this._canExecute(when))
+            return this;
         if (this._arg === null || this._arg === undefined)
             return this;
         if (typeof (this._arg) !== "number")
@@ -37,9 +43,11 @@ class EnsurerInternal {
             throw new n_exception_1.ArgumentException(this._argName, "must be number");
         return this;
     }
-    ensureIsEnum(enumType) {
+    ensureIsEnum(enumType, when) {
         if (enumType == null || typeof (enumType) !== "object")
             throw new n_exception_1.InvalidArgumentException("enumType");
+        if (!this._canExecute(when))
+            return this;
         if (this._arg === null || this._arg === undefined)
             return this;
         if (typeof (this._arg) !== "number" && typeof (this._arg) !== "string")
@@ -49,37 +57,47 @@ class EnsurerInternal {
             throw new n_exception_1.ArgumentException(this._argName, "is not a valid enum value");
         return this;
     }
-    ensureIsBoolean() {
+    ensureIsBoolean(when) {
+        if (!this._canExecute(when))
+            return this;
         if (this._arg === null || this._arg === undefined)
             return this;
         if (typeof (this._arg) !== "boolean")
             throw new n_exception_1.ArgumentException(this._argName, "must be boolean");
         return this;
     }
-    ensureIsObject() {
+    ensureIsObject(when) {
+        if (!this._canExecute(when))
+            return this;
         if (this._arg === null || this._arg === undefined)
             return this;
         if (typeof (this._arg) !== "object")
             throw new n_exception_1.ArgumentException(this._argName, "must be object");
         return this;
     }
-    ensureIsFunction() {
+    ensureIsFunction(when) {
+        if (!this._canExecute(when))
+            return this;
         if (this._arg === null || this._arg === undefined)
             return this;
         if (typeof (this._arg) !== "function")
             throw new n_exception_1.ArgumentException(this._argName, "must be function");
         return this;
     }
-    ensureIsArray() {
+    ensureIsArray(when) {
+        if (!this._canExecute(when))
+            return this;
         if (this._arg === null || this._arg === undefined)
             return this;
         if (!Array.isArray(this._arg))
             throw new n_exception_1.ArgumentException(this._argName, "must be array");
         return this;
     }
-    ensureIsType(type) {
+    ensureIsType(type, when) {
         if (type === null || type === undefined)
             throw new n_exception_1.ArgumentNullException("type");
+        if (!this._canExecute(when))
+            return this;
         if (this._arg == null || this._arg === undefined)
             return this;
         const typeName = type.getTypeName();
@@ -87,18 +105,22 @@ class EnsurerInternal {
             throw new n_exception_1.ArgumentException(this._argName, `must be of type ${typeName}`);
         return this;
     }
-    ensureIsInstanceOf(type) {
+    ensureIsInstanceOf(type, when) {
         if (type === null || type === undefined)
             throw new n_exception_1.ArgumentNullException("type");
+        if (!this._canExecute(when))
+            return this;
         if (this._arg == null || this._arg === undefined)
             return this;
         if (!(this._arg instanceof type))
             throw new n_exception_1.ArgumentException(this._argName, `must be instance of ${type.getTypeName()}`);
         return this;
     }
-    ensureHasStructure(structure) {
+    ensureHasStructure(structure, when) {
         if (structure === null || structure === undefined)
             throw new n_exception_1.ArgumentNullException("structure");
+        if (!this._canExecute(when))
+            return this;
         if (this._arg == null || this._arg === undefined)
             return this;
         this.ensureHasStructureInternal(this._arg, structure);
@@ -117,6 +139,34 @@ class EnsurerInternal {
                 : new n_exception_1.InvalidArgumentException(this._argName);
         }
         return this;
+    }
+    ensureWhen(when, func, reason) {
+        if (when === null || when === undefined)
+            throw new n_exception_1.ArgumentNullException("when");
+        if (func === null || func === undefined)
+            throw new n_exception_1.ArgumentNullException("func");
+        if (!this._canExecute(when))
+            return this;
+        if (this._arg == null || this._arg === undefined)
+            return this;
+        if (!func(this._arg)) {
+            if (this._argName.toLowerCase() === "this")
+                throw new n_exception_1.InvalidOperationException(reason != null && !reason.isEmptyOrWhiteSpace() ? reason.trim() : "current operation on instance");
+            throw reason != null && !reason.isEmptyOrWhiteSpace()
+                ? new n_exception_1.ArgumentException(this._argName, reason.trim())
+                : new n_exception_1.InvalidArgumentException(this._argName);
+        }
+        return this;
+    }
+    _canExecute(when) {
+        let canExecute = true;
+        if (when != null) {
+            if (typeof when === "function")
+                canExecute = when();
+            else
+                canExecute = !!when;
+        }
+        return canExecute;
     }
     ensureHasStructureInternal(arg, schema, parentName) {
         for (let key in schema) {
