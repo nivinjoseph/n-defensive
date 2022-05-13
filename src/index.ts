@@ -10,12 +10,12 @@ import
 
 export interface Ensurer<T>
 {
-    ensureHasValue(when?: boolean | (() => boolean)): this;
-    ensure(func: (arg: T) => boolean): this;
-    ensure(func: (arg: T) => boolean, reason: string): this;
+    ensureHasValue(when?: boolean | (() => boolean)): this | never;
+    ensure(func: (arg: T) => boolean): this | never;
+    ensure(func: (arg: T) => boolean, reason: string): this | never;
     
-    ensureWhen(when: boolean | (() => boolean), func: (arg: T) => boolean): this;
-    ensureWhen(when: boolean | (() => boolean), func: (arg: T) => boolean, reason: string): this;
+    ensureWhen(when: boolean | (() => boolean), func: (arg: T) => boolean): this | never;
+    ensureWhen(when: boolean | (() => boolean), func: (arg: T) => boolean, reason: string): this | never;
     
         // ensureIsString(): Ensurer<T>;
         // ensureIsNumber(): Ensurer<T>;
@@ -29,32 +29,32 @@ export interface Ensurer<T>
 
 export interface StringEnsurer extends Ensurer<string>
 {
-    ensureIsString(when?: boolean | (() => boolean)): this;
-    ensureIsEnum(enumType: object, when?: boolean | (() => boolean)): this;
+    ensureIsString(when?: boolean | (() => boolean)): this | never;
+    ensureIsEnum(enumType: object, when?: boolean | (() => boolean)): this | never;
 }
 export interface NumberEnsurer extends Ensurer<number>
 {
-    ensureIsNumber(when?: boolean | (() => boolean)): this;
-    ensureIsEnum(enumType: object, when?: boolean | (() => boolean)): this;
+    ensureIsNumber(when?: boolean | (() => boolean)): this | never;
+    ensureIsEnum(enumType: object, when?: boolean | (() => boolean)): this | never;
 }
 export interface BooleanEnsurer extends Ensurer<boolean>
 {
-    ensureIsBoolean(when?: boolean | (() => boolean)): this;
+    ensureIsBoolean(when?: boolean | (() => boolean)): this | never;
 }
 export interface ArrayEnsurer<TItem> extends Ensurer<ReadonlyArray<TItem>>
 {
-    ensureIsArray(when?: boolean | (() => boolean)): this;
+    ensureIsArray(when?: boolean | (() => boolean)): this | never;
 }
 export interface FunctionEnsurer extends Ensurer<Function>
 {
-    ensureIsFunction(when?: boolean | (() => boolean)): this;
+    ensureIsFunction(when?: boolean | (() => boolean)): this | never;
 }
 export interface ObjectEnsurer<T extends object> extends Ensurer<T>
 {
-    ensureIsObject(when?: boolean | (() => boolean)): this;
-    ensureIsType(type: new (...args: any[]) => T, when?: boolean | (() => boolean)): this;
-    ensureIsInstanceOf(type: Function & { prototype: T }, when?: boolean | (() => boolean)): this;
-    ensureHasStructure(structure: object, when?: boolean | (() => boolean)): this;
+    ensureIsObject(when?: boolean | (() => boolean)): this | never;
+    ensureIsType(type: new (...args: any[]) => T, when?: boolean | (() => boolean)): this | never;
+    ensureIsInstanceOf(type: Function & { prototype: T }, when?: boolean | (() => boolean)): this | never;
+    ensureHasStructure(structure: object, when?: boolean | (() => boolean)): this | never;
 }
 
 
@@ -82,13 +82,13 @@ class EnsurerInternal<T> implements Ensurer<T>
     private _argName: string;
 
 
-    constructor(arg: T, argName: string)
+    public constructor(arg: T, argName: string)
     {
         this._arg = arg;
         this._argName = argName;
     }
 
-    public ensureHasValue(when?: boolean | (() => boolean)): this
+    public ensureHasValue(when?: boolean | (() => boolean)): this | never
     {
         if (!this._canExecute(when))
             return this;
@@ -102,7 +102,7 @@ class EnsurerInternal<T> implements Ensurer<T>
         return this;
     }
     
-    public ensureIsString(when?: boolean | (() => boolean)): this
+    public ensureIsString(when?: boolean | (() => boolean)): this | never
     {
         if (!this._canExecute(when))
             return this;
@@ -116,7 +116,7 @@ class EnsurerInternal<T> implements Ensurer<T>
         return this;
     }
     
-    public ensureIsNumber(when?: boolean | (() => boolean)): this
+    public ensureIsNumber(when?: boolean | (() => boolean)): this | never
     {
         if (!this._canExecute(when))
             return this;
@@ -133,7 +133,7 @@ class EnsurerInternal<T> implements Ensurer<T>
         return this;
     }
     
-    public ensureIsEnum(enumType: object, when?: boolean | (() => boolean)): this
+    public ensureIsEnum(enumType: object, when?: boolean | (() => boolean)): this | never
     {
         if (enumType == null || typeof (enumType) !== "object")
             throw new InvalidArgumentException("enumType");
@@ -154,7 +154,7 @@ class EnsurerInternal<T> implements Ensurer<T>
         return this;
     }
     
-    public ensureIsBoolean(when?: boolean | (() => boolean)): this
+    public ensureIsBoolean(when?: boolean | (() => boolean)): this | never
     {
         if (!this._canExecute(when))
             return this;
@@ -168,7 +168,7 @@ class EnsurerInternal<T> implements Ensurer<T>
         return this;
     }
     
-    public ensureIsObject(when?: boolean | (() => boolean)): this
+    public ensureIsObject(when?: boolean | (() => boolean)): this | never
     {
         if (!this._canExecute(when))
             return this;
@@ -182,7 +182,7 @@ class EnsurerInternal<T> implements Ensurer<T>
         return this;
     }
     
-    public ensureIsFunction(when?: boolean | (() => boolean)): this
+    public ensureIsFunction(when?: boolean | (() => boolean)): this | never
     {
         if (!this._canExecute(when))
             return this;
@@ -196,7 +196,7 @@ class EnsurerInternal<T> implements Ensurer<T>
         return this;
     }
     
-    public ensureIsArray(when?: boolean | (() => boolean)): this
+    public ensureIsArray(when?: boolean | (() => boolean)): this | never
     {
         if (!this._canExecute(when))
             return this;
@@ -210,7 +210,7 @@ class EnsurerInternal<T> implements Ensurer<T>
         return this;
     }
     
-    public ensureIsType(type: Function, when?: boolean | (() => boolean)): this
+    public ensureIsType(type: Function, when?: boolean | (() => boolean)): this | never
     {
         if (type === null || type === undefined)
             throw new ArgumentNullException("type");
@@ -228,7 +228,7 @@ class EnsurerInternal<T> implements Ensurer<T>
         return this;
     }
     
-    public ensureIsInstanceOf(type: Function, when?: boolean | (() => boolean)): this
+    public ensureIsInstanceOf(type: Function, when?: boolean | (() => boolean)): this | never
     {
         if (type === null || type === undefined)
             throw new ArgumentNullException("type");
@@ -245,7 +245,7 @@ class EnsurerInternal<T> implements Ensurer<T>
         return this;
     }
     
-    public ensureHasStructure(structure: object, when?: boolean | (() => boolean)): this
+    public ensureHasStructure(structure: object, when?: boolean | (() => boolean)): this | never
     {
         if (structure === null || structure === undefined)
             throw new ArgumentNullException("structure");
@@ -261,9 +261,9 @@ class EnsurerInternal<T> implements Ensurer<T>
         return this;
     }
 
-    public ensure(func: (arg: T) => boolean): this;   
-    public ensure(func: (arg: T) => boolean, reason: string): this;
-    public ensure(func: (arg: T) => boolean, reason?: string): this
+    public ensure(func: (arg: T) => boolean): this | never;   
+    public ensure(func: (arg: T) => boolean, reason: string): this | never;
+    public ensure(func: (arg: T) => boolean, reason?: string): this | never
     {
         if (func === null || func === undefined)
             throw new ArgumentNullException("func");    
@@ -284,9 +284,9 @@ class EnsurerInternal<T> implements Ensurer<T>
         return this;
     }
     
-    public ensureWhen(when: boolean | (() => boolean), func: (arg: T) => boolean): this;
-    public ensureWhen(when: boolean | (() => boolean), func: (arg: T) => boolean, reason: string): this;
-    public ensureWhen(when: boolean | (() => boolean), func: (arg: T) => boolean, reason?: string): this
+    public ensureWhen(when: boolean | (() => boolean), func: (arg: T) => boolean): this | never;
+    public ensureWhen(when: boolean | (() => boolean), func: (arg: T) => boolean, reason: string): this | never;
+    public ensureWhen(when: boolean | (() => boolean), func: (arg: T) => boolean, reason?: string): this | never
     {
         if (when === null || when === undefined)
             throw new ArgumentNullException("when");
