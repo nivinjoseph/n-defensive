@@ -25,7 +25,7 @@ export interface FunctionEnsurer extends Ensurer<Function> {
 }
 export interface ObjectEnsurer<T extends object> extends Ensurer<T> {
     ensureIsObject(when?: boolean | (() => boolean)): this | never;
-    ensureIsType(type: new (...args: any[]) => T, when?: boolean | (() => boolean)): this | never;
+    ensureIsType(type: new (...args: Array<any>) => T, when?: boolean | (() => boolean)): this | never;
     ensureIsInstanceOf(type: Function & {
         prototype: T;
     }, when?: boolean | (() => boolean)): this | never;
