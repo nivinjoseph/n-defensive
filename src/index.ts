@@ -4,7 +4,7 @@ import
     ArgumentException,
     ArgumentNullException,
     InvalidArgumentException,
-    InvalidOperationException,
+    InvalidOperationException
 } from "@nivinjoseph/n-exception";
 
 
@@ -52,8 +52,8 @@ export interface FunctionEnsurer extends Ensurer<Function>
 export interface ObjectEnsurer<T extends object> extends Ensurer<T>
 {
     ensureIsObject(when?: boolean | (() => boolean)): this | never;
-    ensureIsType(type: new (...args: any[]) => T, when?: boolean | (() => boolean)): this | never;
-    ensureIsInstanceOf(type: Function & { prototype: T }, when?: boolean | (() => boolean)): this | never;
+    ensureIsType(type: new (...args: Array<any>) => T, when?: boolean | (() => boolean)): this | never;
+    ensureIsInstanceOf(type: Function & { prototype: T; }, when?: boolean | (() => boolean)): this | never;
     ensureHasStructure(structure: object, when?: boolean | (() => boolean)): this | never;
 }
 
@@ -67,10 +67,11 @@ function given<T extends object>(arg: T, argName: string): ObjectEnsurer<T>;
 function given<T, U extends Ensurer<T>>(arg: T, argName: string): U;
 function given<T, U extends Ensurer<T>>(arg: T, argName: string): U
 {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (argName == null || argName.isEmptyOrWhiteSpace())
         throw new ArgumentNullException("argName");
     
-    return new EnsurerInternal(arg, argName.trim()) as any;
+    return new EnsurerInternal(arg, argName.trim()) as unknown as U;
 }
 
 export { given } ;
@@ -78,8 +79,8 @@ export { given } ;
 
 class EnsurerInternal<T> implements Ensurer<T>
 {
-    private _arg: T;
-    private _argName: string;
+    private readonly _arg: T;
+    private readonly _argName: string;
 
 
     public constructor(arg: T, argName: string)
@@ -96,7 +97,7 @@ class EnsurerInternal<T> implements Ensurer<T>
         if (this._arg === null || this._arg === undefined)
             throw new ArgumentNullException(this._argName);
         
-        if (typeof (this._arg) === "string" && (<string>this._arg).isEmptyOrWhiteSpace())
+        if (typeof this._arg === "string" && (<string>this._arg).isEmptyOrWhiteSpace())
             throw new ArgumentException(this._argName, "string value cannot be empty or whitespace");    
 
         return this;
@@ -110,7 +111,7 @@ class EnsurerInternal<T> implements Ensurer<T>
         if (this._arg === null || this._arg === undefined)
             return this;
         
-        if (typeof (this._arg) !== "string")
+        if (typeof this._arg !== "string")
             throw new ArgumentException(this._argName, "must be string");
         
         return this;
@@ -124,10 +125,10 @@ class EnsurerInternal<T> implements Ensurer<T>
         if (this._arg === null || this._arg === undefined)
             return this;
 
-        if (typeof (this._arg) !== "number")
+        if (typeof this._arg !== "number")
             throw new ArgumentException(this._argName, "must be number");
 
-        if (!this.isNumber(this._arg))
+        if (!this._isNumber(this._arg))
             throw new ArgumentException(this._argName, "must be number");
         
         return this;
@@ -135,7 +136,8 @@ class EnsurerInternal<T> implements Ensurer<T>
     
     public ensureIsEnum(enumType: object, when?: boolean | (() => boolean)): this | never
     {
-        if (enumType == null || typeof (enumType) !== "object")
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (enumType == null || typeof enumType !== "object")
             throw new InvalidArgumentException("enumType");
         
         if (!this._canExecute(when))
@@ -144,10 +146,10 @@ class EnsurerInternal<T> implements Ensurer<T>
         if (this._arg === null || this._arg === undefined)
             return this;
         
-        if (typeof (this._arg) !== "number" && typeof(this._arg) !== "string")
+        if (typeof this._arg !== "number" && typeof this._arg !== "string")
             throw new ArgumentException(this._argName, "must be a valid enum value");
         
-        const values = this.getEnumValues(enumType);
+        const values = this._getEnumValues(enumType);
         if (!values.contains(this._arg))
             throw new ArgumentException(this._argName, "is not a valid enum value");
         
@@ -162,7 +164,7 @@ class EnsurerInternal<T> implements Ensurer<T>
         if (this._arg === null || this._arg === undefined)
             return this;
 
-        if (typeof (this._arg) !== "boolean")
+        if (typeof this._arg !== "boolean")
             throw new ArgumentException(this._argName, "must be boolean");
 
         return this;
@@ -176,7 +178,7 @@ class EnsurerInternal<T> implements Ensurer<T>
         if (this._arg === null || this._arg === undefined)
             return this;
 
-        if (typeof (this._arg) !== "object")
+        if (typeof this._arg !== "object")
             throw new ArgumentException(this._argName, "must be object");
 
         return this;
@@ -190,7 +192,7 @@ class EnsurerInternal<T> implements Ensurer<T>
         if (this._arg === null || this._arg === undefined)
             return this;
 
-        if (typeof (this._arg) !== "function")
+        if (typeof this._arg !== "function")
             throw new ArgumentException(this._argName, "must be function");
 
         return this;
@@ -212,6 +214,7 @@ class EnsurerInternal<T> implements Ensurer<T>
     
     public ensureIsType(type: Function, when?: boolean | (() => boolean)): this | never
     {
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (type === null || type === undefined)
             throw new ArgumentNullException("type");
         
@@ -230,6 +233,7 @@ class EnsurerInternal<T> implements Ensurer<T>
     
     public ensureIsInstanceOf(type: Function, when?: boolean | (() => boolean)): this | never
     {
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (type === null || type === undefined)
             throw new ArgumentNullException("type");
         
@@ -247,6 +251,7 @@ class EnsurerInternal<T> implements Ensurer<T>
     
     public ensureHasStructure(structure: object, when?: boolean | (() => boolean)): this | never
     {
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (structure === null || structure === undefined)
             throw new ArgumentNullException("structure");
         
@@ -256,7 +261,7 @@ class EnsurerInternal<T> implements Ensurer<T>
         if (this._arg == null || this._arg === undefined)
             return this;
         
-        this.ensureHasStructureInternal(this._arg, structure);
+        this._ensureHasStructureInternal(this._arg, structure);
            
         return this;
     }
@@ -265,6 +270,7 @@ class EnsurerInternal<T> implements Ensurer<T>
     public ensure(func: (arg: T) => boolean, reason: string): this | never;
     public ensure(func: (arg: T) => boolean, reason?: string): this | never
     {
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (func === null || func === undefined)
             throw new ArgumentNullException("func");    
         
@@ -288,9 +294,11 @@ class EnsurerInternal<T> implements Ensurer<T>
     public ensureWhen(when: boolean | (() => boolean), func: (arg: T) => boolean, reason: string): this | never;
     public ensureWhen(when: boolean | (() => boolean), func: (arg: T) => boolean, reason?: string): this | never
     {
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (when === null || when === undefined)
             throw new ArgumentNullException("when");
         
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (func === null || func === undefined)
             throw new ArgumentNullException("func");
             
@@ -328,18 +336,18 @@ class EnsurerInternal<T> implements Ensurer<T>
         return canExecute;
     }
     
-    private ensureHasStructureInternal(arg: any, schema: any, parentName?: string)
+    private _ensureHasStructureInternal(arg: any, schema: any, parentName?: string): void
     {
-        for (let key in schema)
+        for (const key in schema)
         {
-            let isOptional = key.endsWith("?");
-            let name = isOptional ? key.substring(0, key.length - 1) : key;
+            const isOptional = key.endsWith("?");
+            const name = isOptional ? key.substring(0, key.length - 1) : key;
             if (name.isEmptyOrWhiteSpace())
                 throw new ArgumentException("structure", `invalid key specification '${key}'`);
-            let fullName = parentName ? `${parentName}.${name}` : name;
+            const fullName = parentName ? `${parentName}.${name}` : name;
 
             const typeInfo = schema[key];
-            const typeName = this.getTypeNameInternal(typeInfo, fullName);
+            const typeName = this._getTypeNameInternal(typeInfo, fullName);
 
             const value = arg[name];
             if (value === null || value === undefined)
@@ -350,89 +358,90 @@ class EnsurerInternal<T> implements Ensurer<T>
                 throw new ArgumentException(this._argName, `is missing required property '${fullName}' of type '${typeName}'`);
             }
 
-            this.ensureHasTypeInternal(typeName, typeInfo, fullName, value);
+            this._ensureHasTypeInternal(typeName, typeInfo, fullName, value);
         }
     }
 
-    private getTypeNameInternal(typeInfo: any, fullName: string): string
+    private _getTypeNameInternal(typeInfo: any, fullName: string): string
     {
-        let types = ["string", "boolean", "number", "object", "array"];
+        const types = ["string", "boolean", "number", "object", "array"];
 
         if (typeInfo === null || typeInfo === undefined)
             throw new ArgumentException("structure", `null type specification for key '${fullName}'`);
 
-        if (typeof (typeInfo) !== "string" && typeof (typeInfo) !== "object")
+        if (typeof typeInfo !== "string" && typeof typeInfo !== "object")
             throw new ArgumentException("structure", `invalid type specification '${typeInfo}' for key '${fullName}'`);
 
-        const typeName = typeof (typeInfo) === "string" ? typeInfo.trim().toLowerCase() : Array.isArray(typeInfo) ? "array" : "object";
+        const typeName = typeof typeInfo === "string" ? typeInfo.trim().toLowerCase() : Array.isArray(typeInfo) ? "array" : "object";
         if (types.every(t => t !== typeName))
             throw new ArgumentException("structure", `invalid type specification '${typeInfo}' for key '${fullName}'`);
 
         return typeName;
     }
 
-    private ensureHasTypeInternal(typeName: string, typeInfo: any, fullName: string, value: any): void
+    private _ensureHasTypeInternal(typeName: string, typeInfo: any, fullName: string, value: any): void
     {
         if (typeName === "object")
         {
-            if (typeof (typeInfo) !== "string")
+            if (typeof typeInfo !== "string")
             {
-                this.ensureHasStructureInternal(value, typeInfo, fullName);
+                this._ensureHasStructureInternal(value, typeInfo, fullName);
             }
             else
             {
-                if (typeof (value) !== typeName)
+                if (typeof value !== typeName)
                     throw new ArgumentException(this._argName,
-                        `invalid value of type '${typeof (value)}' for property '${fullName}' of type '${typeName}'`);
+                        `invalid value of type '${typeof value}' for property '${fullName}' of type '${typeName}'`);
             }
         }
         else if (typeName === "array")
         {
             if (!Array.isArray(value))
                 throw new ArgumentException(this._argName,
-                    `invalid value of type '${typeof (value)}' for property '${fullName}' of type '${typeName}'`);
+                    `invalid value of type '${typeof value}' for property '${fullName}' of type '${typeName}'`);
 
-            if (typeof (typeInfo) !== "string")
+            if (typeof typeInfo !== "string")
             {
                 const typeInfoArray = typeInfo as Array<any>;
                 if (typeInfoArray.length > 0)
                 {
                     const arrayTypeInfo = typeInfoArray[0];
-                    const arrayTypeName = this.getTypeNameInternal(arrayTypeInfo, fullName);
+                    const arrayTypeName = this._getTypeNameInternal(arrayTypeInfo, fullName);
 
-                    (<Array<any>>value).forEach(t => this.ensureHasTypeInternal(arrayTypeName, arrayTypeInfo, fullName, t));
+                    value.forEach(t => this._ensureHasTypeInternal(arrayTypeName, arrayTypeInfo, fullName, t));
                 }
             }
         }
         else
         {
-            if (typeof (value) !== typeName)
+            if (typeof value !== typeName)
                 throw new ArgumentException(this._argName,
-                    `invalid value of type '${typeof (value)}' for property '${fullName}' of type '${typeName}'`);
+                    `invalid value of type '${typeof value}' for property '${fullName}' of type '${typeName}'`);
         }
     }
     
-    private isNumber(value: any): boolean
+    private _isNumber(value: any): boolean
     {
         if (value == null)
             return false;
         
-        value = value.toString().trim();
+        value = (<object>value).toString().trim();
         if (value.length === 0)
             return false;
-        let parsed = +value.toString().trim();
+        const parsed = +(<object>value).toString().trim();
         return !isNaN(parsed) && isFinite(parsed);
     }
 
-    private getEnumValues(enumType: object): ReadonlyArray<any>
+    private _getEnumValues(enumType: object): ReadonlyArray<string | number>
     {
         const keys = Object.keys(enumType);
         if (keys.length === 0)
             return [];
 
-        if (this.isNumber(keys[0]))
-            return keys.filter(t => this.isNumber(t)).map(t => +t);
+        if (this._isNumber(keys[0]))
+            return keys.filter(t => this._isNumber(t)).map(t => +t);
 
-        return keys.map(t => (<any>enumType)[t]);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        return keys.map(t => (<any>enumType)[t]) as Array<string | number>;
     }
 }
