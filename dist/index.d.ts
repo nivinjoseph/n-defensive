@@ -19,6 +19,7 @@ export interface BooleanEnsurer extends Ensurer<boolean> {
 }
 export interface ArrayEnsurer<TItem> extends Ensurer<ReadonlyArray<TItem>> {
     ensureIsArray(when?: boolean | (() => boolean)): this | never;
+    ensureIsNotEmpty(when?: boolean | (() => boolean)): this | never;
 }
 export interface FunctionEnsurer extends Ensurer<Function> {
     ensureIsFunction(when?: boolean | (() => boolean)): this | never;
@@ -29,13 +30,9 @@ export interface ObjectEnsurer<T extends object> extends Ensurer<T> {
     ensureIsInstanceOf(type: Function & {
         prototype: T;
     }, when?: boolean | (() => boolean)): this | never;
-    ensureHasStructure(structure: object, when?: boolean | (() => boolean)): this | never;
+    ensureHasStructure<U extends string | Function | object | Array<U>>(structure: Record<string, U>, when?: boolean | (() => boolean)): this | never;
 }
-declare function given(arg: string, argName: string): StringEnsurer;
-declare function given(arg: number, argName: string): NumberEnsurer;
-declare function given(arg: boolean, argName: string): BooleanEnsurer;
-declare function given<TItem>(arg: ReadonlyArray<TItem>, argName: string): ArrayEnsurer<TItem>;
-declare function given(arg: Function, argName: string): FunctionEnsurer;
-declare function given<T extends object>(arg: T, argName: string): ObjectEnsurer<T>;
-declare function given<T, U extends Ensurer<T>>(arg: T, argName: string): U;
+declare type Nullable<T> = T | null | undefined;
+declare type CondUnionNullable<T> = NonNullable<Nullable<T>>;
+declare function given<T>(arg: T, argName: string): T extends CondUnionNullable<string> ? StringEnsurer : T extends CondUnionNullable<number> ? NumberEnsurer : T extends CondUnionNullable<boolean> ? BooleanEnsurer : T extends CondUnionNullable<ReadonlyArray<infer U>> ? ArrayEnsurer<U> : T extends CondUnionNullable<Function> ? FunctionEnsurer : T extends CondUnionNullable<object> ? ObjectEnsurer<T> : never;
 export { given };
