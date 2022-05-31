@@ -11,6 +11,7 @@ import
 export interface Ensurer<T>
 {
     ensureHasValue(when?: boolean | (() => boolean)): this | never;
+    
     ensure(func: (arg: T) => boolean): this | never;
     ensure(func: (arg: T) => boolean, reason: string): this | never;
     
@@ -44,6 +45,7 @@ export interface BooleanEnsurer extends Ensurer<boolean>
 export interface ArrayEnsurer<TItem> extends Ensurer<ReadonlyArray<TItem>>
 {
     ensureIsArray(when?: boolean | (() => boolean)): this | never;
+    ensureIsNotEmpty(when?: boolean | (() => boolean)): this | never;
 }
 export interface FunctionEnsurer extends Ensurer<Function>
 {
@@ -54,30 +56,62 @@ export interface ObjectEnsurer<T extends object> extends Ensurer<T>
     ensureIsObject(when?: boolean | (() => boolean)): this | never;
     ensureIsType(type: new (...args: Array<any>) => T, when?: boolean | (() => boolean)): this | never;
     ensureIsInstanceOf(type: Function & { prototype: T; }, when?: boolean | (() => boolean)): this | never;
-    ensureHasStructure(structure: object, when?: boolean | (() => boolean)): this | never;
+    ensureHasStructure<U extends string | Function | object | Array<U>>(structure: Record<string, U>, when?: boolean | (() => boolean)): this | never;
 }
 
 
-function given(arg: string, argName: string): StringEnsurer;
-function given(arg: number, argName: string): NumberEnsurer;
-function given(arg: boolean, argName: string): BooleanEnsurer;
-function given<TItem>(arg: ReadonlyArray<TItem>, argName: string): ArrayEnsurer<TItem>;
-function given(arg: Function, argName: string): FunctionEnsurer;
-function given<T extends object>(arg: T, argName: string): ObjectEnsurer<T>;
-function given<T, U extends Ensurer<T>>(arg: T, argName: string): U;
-function given<T, U extends Ensurer<T>>(arg: T, argName: string): U
+// function given(arg: string, argName: string): StringEnsurer;
+// function given(arg: number, argName: string): NumberEnsurer;
+// function given(arg: boolean, argName: string): BooleanEnsurer;
+// function given<TItem>(arg: ReadonlyArray<TItem>, argName: string): ArrayEnsurer<TItem>;
+// function given(arg: Function, argName: string): FunctionEnsurer;
+// function given<T extends object>(arg: T, argName: string): ObjectEnsurer<T>;
+// function given<T, U extends Ensurer<T>>(arg: T, argName: string): U;
+// function given<T, U extends Ensurer<T>>(arg: T, argName: string): U
+// {
+//     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+//     if (argName == null || argName.isEmptyOrWhiteSpace())
+//         throw new ArgumentNullException("argName");
+    
+//     return new EnsurerInternal(arg, argName.trim()) as unknown as U;
+// }
+
+// type NullableString = string | null | undefined;
+// type CondUnionStringType = NonNullable<NullableString>;
+
+// type NullableNumber = number | null | undefined;
+// type CondUnionNumberType = NonNullable<NullableNumber>;
+
+// type NullableBoolean = boolean | null | undefined;
+// type CondUnionBooleanType = NonNullable<NullableBoolean>;
+
+// type NullableArray = Array<any> | null | undefined;
+// type CondUnionArrayType = NonNullable<NullableArray>;
+
+type Nullable<T> = T | null | undefined;
+type CondUnionNullable<T> = NonNullable<Nullable<T>>;
+
+function given<T>(arg: T, argName: string)
+    : T extends CondUnionNullable<string> ? StringEnsurer
+    : T extends CondUnionNullable<number> ? NumberEnsurer
+    : T extends CondUnionNullable<boolean> ? BooleanEnsurer
+    : T extends CondUnionNullable<ReadonlyArray<infer U>> ? ArrayEnsurer<U>
+    : T extends CondUnionNullable<Function> ? FunctionEnsurer
+    : T extends CondUnionNullable<object> ? ObjectEnsurer<T>
+    : never
 {
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (argName == null || argName.isEmptyOrWhiteSpace())
         throw new ArgumentNullException("argName");
-    
-    return new EnsurerInternal(arg, argName.trim()) as unknown as U;
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return new EnsurerInternal(arg, argName.trim()) as any;
 }
 
-export { given } ;
+export { given };
+    
 
-
-class EnsurerInternal<T> implements Ensurer<T>
+class EnsurerInternal<T>
 {
     private readonly _arg: T;
     private readonly _argName: string;
@@ -98,8 +132,10 @@ class EnsurerInternal<T> implements Ensurer<T>
             throw new ArgumentNullException(this._argName);
         
         if (typeof this._arg === "string" && (<string>this._arg).isEmptyOrWhiteSpace())
-            throw new ArgumentException(this._argName, "string value cannot be empty or whitespace");    
+            throw new ArgumentException(this._argName, "string value cannot be empty or whitespace");
 
+        // this._ensureHasValue(this._arg);
+        
         return this;
     }
     
@@ -212,6 +248,23 @@ class EnsurerInternal<T> implements Ensurer<T>
         return this;
     }
     
+    public ensureIsNotEmpty(when?: boolean | (() => boolean)): this | never
+    {
+        if (!this._canExecute(when))
+            return this;
+
+        if (this._arg === null || this._arg === undefined)
+            return this;
+
+        if (!Array.isArray(this._arg))
+            throw new ArgumentException(this._argName, "must be array");
+
+        if (this._arg.isEmpty)
+            throw new ArgumentException(this._argName, "must not be empty");
+        
+        return this;
+    }
+    
     public ensureIsType(type: Function, when?: boolean | (() => boolean)): this | never
     {
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -249,7 +302,8 @@ class EnsurerInternal<T> implements Ensurer<T>
         return this;
     }
     
-    public ensureHasStructure(structure: object, when?: boolean | (() => boolean)): this | never
+    public ensureHasStructure<U extends string | Function | object | Array<U>>(structure: Record<string, U>,
+        when?: boolean | (() => boolean)): this | never
     {
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (structure === null || structure === undefined)
@@ -261,7 +315,7 @@ class EnsurerInternal<T> implements Ensurer<T>
         if (this._arg == null || this._arg === undefined)
             return this;
         
-        this._ensureHasStructureInternal(this._arg, structure);
+        this._ensureHasStructure(this._arg, structure);
            
         return this;
     }
@@ -277,12 +331,22 @@ class EnsurerInternal<T> implements Ensurer<T>
         if (this._arg == null || this._arg === undefined)
             return this;
         
-        if (!func(this._arg))
+        let result;
+        try 
+        {
+            result = func(this._arg);
+        }
+        catch (error)
+        {
+            throw new InvalidArgumentException(this._argName, error as Error);
+        }
+        
+        if (!result)
         {
             if (this._argName.toLowerCase() === "this")
-                throw new InvalidOperationException(reason != null && !reason.isEmptyOrWhiteSpace() ? reason.trim() : "current operation on instance");
+                throw new InvalidOperationException(reason != null && reason.isNotEmptyOrWhiteSpace() ? reason.trim() : "current operation on instance");
 
-            throw reason != null && !reason.isEmptyOrWhiteSpace()
+            throw reason != null && reason.isNotEmptyOrWhiteSpace()
                 ? new ArgumentException(this._argName, reason.trim())
                 : new InvalidArgumentException(this._argName);
         }
@@ -336,7 +400,16 @@ class EnsurerInternal<T> implements Ensurer<T>
         return canExecute;
     }
     
-    private _ensureHasStructureInternal(arg: any, schema: any, parentName?: string): void
+    // private _ensureHasValue(value: T): asserts value is NonNullable<T>
+    // {
+    //     if (value === null || value === undefined)
+    //         throw new ArgumentNullException(this._argName);
+
+    //     if (typeof value === "string" && (<string>value).isEmptyOrWhiteSpace())
+    //         throw new ArgumentException(this._argName, "string value cannot be empty or whitespace");
+    // }
+    
+    private _ensureHasStructure<U extends string | Function | object | Array<U>>(arg: any, schema: Record<string, U>, parentName?: string): void
     {
         for (const key in schema)
         {
@@ -346,79 +419,156 @@ class EnsurerInternal<T> implements Ensurer<T>
                 throw new ArgumentException("structure", `invalid key specification '${key}'`);
             const fullName = parentName ? `${parentName}.${name}` : name;
 
-            const typeInfo = schema[key];
-            const typeName = this._getTypeNameInternal(typeInfo, fullName);
-
             const value = arg[name];
             if (value === null || value === undefined)
             {
                 if (isOptional)
                     continue;
 
-                throw new ArgumentException(this._argName, `is missing required property '${fullName}' of type '${typeName}'`);
+                throw new ArgumentException(this._argName, `is missing required property '${fullName}'`);
             }
-
-            this._ensureHasTypeInternal(typeName, typeInfo, fullName, value);
-        }
-    }
-
-    private _getTypeNameInternal(typeInfo: any, fullName: string): string
-    {
-        const types = ["string", "boolean", "number", "object", "array"];
-
-        if (typeInfo === null || typeInfo === undefined)
-            throw new ArgumentException("structure", `null type specification for key '${fullName}'`);
-
-        if (typeof typeInfo !== "string" && typeof typeInfo !== "object")
-            throw new ArgumentException("structure", `invalid type specification '${typeInfo}' for key '${fullName}'`);
-
-        const typeName = typeof typeInfo === "string" ? typeInfo.trim().toLowerCase() : Array.isArray(typeInfo) ? "array" : "object";
-        if (types.every(t => t !== typeName))
-            throw new ArgumentException("structure", `invalid type specification '${typeInfo}' for key '${fullName}'`);
-
-        return typeName;
-    }
-
-    private _ensureHasTypeInternal(typeName: string, typeInfo: any, fullName: string, value: any): void
-    {
-        if (typeName === "object")
-        {
-            if (typeof typeInfo !== "string")
+            
+            const typeInfo = schema[key];
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+            if (typeInfo === null || typeInfo === undefined)
+                throw new ArgumentException("structure", `null type specification for key '${fullName}'`);
+            
+            if (typeof typeInfo !== "string" && typeof typeInfo !== "function" && typeof typeInfo !== "object")
+                throw new ArgumentException("structure", `invalid type specification '${typeInfo}' for key '${fullName}'`);
+            
+            if (typeof typeInfo === "string")
             {
-                this._ensureHasStructureInternal(value, typeInfo, fullName);
-            }
-            else
-            {
+                if (typeInfo.isEmptyOrWhiteSpace())
+                    throw new ArgumentException("structure", `invalid type specification '${typeInfo}' for key '${fullName}'`);
+                
+                const typeName = typeInfo.trim().toLowerCase();
+                
+                const types = ["string", "boolean", "number", "function", "array", "object"];
+                if (!types.contains(typeName))
+                    throw new ArgumentException("structure", `invalid type specification '${typeInfo}' for key '${fullName}'`);
+                
+                if (typeName === "array")
+                {
+                    if (!Array.isArray(value))
+                        throw new ArgumentException(this._argName,
+                            `invalid value of type '${typeof value}' for property '${fullName}' of type '${typeName}'`);
+                    
+                    continue;
+                }    
+                
                 if (typeof value !== typeName)
                     throw new ArgumentException(this._argName,
                         `invalid value of type '${typeof value}' for property '${fullName}' of type '${typeName}'`);
+                
+                continue;
             }
-        }
-        else if (typeName === "array")
-        {
-            if (!Array.isArray(value))
-                throw new ArgumentException(this._argName,
-                    `invalid value of type '${typeof value}' for property '${fullName}' of type '${typeName}'`);
-
-            if (typeof typeInfo !== "string")
+            
+            if (typeof typeInfo === "function")
             {
-                const typeInfoArray = typeInfo as Array<any>;
-                if (typeInfoArray.length > 0)
-                {
-                    const arrayTypeInfo = typeInfoArray[0];
-                    const arrayTypeName = this._getTypeNameInternal(arrayTypeInfo, fullName);
-
-                    value.forEach(t => this._ensureHasTypeInternal(arrayTypeName, arrayTypeInfo, fullName, t));
-                }
+                if (!(value instanceof typeInfo))
+                    throw new ArgumentException(this._argName, `invalid value of type '${(<Object>value).getTypeName()}' for property '${fullName}' of type '${(<Object>typeInfo).getTypeName()}'`);
+                
+                continue;
             }
-        }
-        else
-        {
-            if (typeof value !== typeName)
-                throw new ArgumentException(this._argName,
-                    `invalid value of type '${typeof value}' for property '${fullName}' of type '${typeName}'`);
+            
+            if (Array.isArray(typeInfo))
+            {
+                if (!Array.isArray(value))
+                    throw new ArgumentException(this._argName,
+                        `invalid value of type '${typeof value}' for property '${fullName}' of type 'array'`);
+                
+                if (typeInfo.isEmpty)
+                    continue;
+                    
+                if (typeInfo.length > 1)
+                    throw new ArgumentException("structure", `invalid type specification '${typeInfo}' for key '${fullName}'`);
+                
+                const arrayTypeInfo = typeInfo[0];
+                const arrayArg: Record<string, any> = {};
+                const arraySchema: Record<string, any> = {};
+                value.forEach((val, index) =>
+                {
+                    arrayArg[index.toString()] = val;
+                    arraySchema[index.toString()] = arrayTypeInfo;
+                });
+                
+                this._ensureHasStructure(arrayArg, arraySchema, fullName);
+                
+                continue;
+            }
+            
+            if (typeof typeInfo === "object")
+            {
+                if (typeof value !== "object")
+                    throw new ArgumentException(this._argName,
+                        `invalid value of type '${(<Object>value).getTypeName()}' for property '${fullName}' of type '{}'`);
+                
+                this._ensureHasStructure(value, typeInfo as Record<string, U>, fullName);
+                
+                continue;
+            }
+            
+            throw new ArgumentException("structure", `invalid type specification '${typeInfo}' for key '${fullName}'`);
         }
     }
+
+    // private _getTypeName(typeInfo: any, fullName: string): string
+    // {
+    //     const types = ["string", "boolean", "number", "object", "array"];
+
+    //     if (typeInfo === null || typeInfo === undefined)
+    //         throw new ArgumentException("structure", `null type specification for key '${fullName}'`);
+
+    //     if (typeof typeInfo !== "string" && typeof typeInfo !== "object")
+    //         throw new ArgumentException("structure", `invalid type specification '${typeInfo}' for key '${fullName}'`);
+
+    //     const typeName = typeof typeInfo === "string" ? typeInfo.trim().toLowerCase() : Array.isArray(typeInfo) ? "array" : "object";
+    //     if (types.every(t => t !== typeName))
+    //         throw new ArgumentException("structure", `invalid type specification '${typeInfo}' for key '${fullName}'`);
+
+    //     return typeName;
+    // }
+
+    // private _ensureHasTypeInternal(typeName: string, typeInfo: any, fullName: string, value: any): void
+    // {
+    //     if (typeName === "object")
+    //     {
+    //         if (typeof typeInfo !== "string")
+    //         {
+    //             this._ensureHasStructure(value, typeInfo, fullName);
+    //         }
+    //         else
+    //         {
+    //             if (typeof value !== typeName)
+    //                 throw new ArgumentException(this._argName,
+    //                     `invalid value of type '${typeof value}' for property '${fullName}' of type '${typeName}'`);
+    //         }
+    //     }
+    //     else if (typeName === "array")
+    //     {
+    //         if (!Array.isArray(value))
+    //             throw new ArgumentException(this._argName,
+    //                 `invalid value of type '${typeof value}' for property '${fullName}' of type '${typeName}'`);
+
+    //         if (typeof typeInfo !== "string")
+    //         {
+    //             const typeInfoArray = typeInfo as Array<any>;
+    //             if (typeInfoArray.length > 0)
+    //             {
+    //                 const arrayTypeInfo = typeInfoArray[0];
+    //                 const arrayTypeName = this._getTypeName(arrayTypeInfo, fullName);
+
+    //                 value.forEach(t => this._ensureHasTypeInternal(arrayTypeName, arrayTypeInfo, fullName, t));
+    //             }
+    //         }
+    //     }
+    //     else
+    //     {
+    //         if (typeof value !== typeName)
+    //             throw new ArgumentException(this._argName,
+    //                 `invalid value of type '${typeof value}' for property '${fullName}' of type '${typeName}'`);
+    //     }
+    // }
     
     private _isNumber(value: any): boolean
     {
