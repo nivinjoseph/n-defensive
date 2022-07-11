@@ -435,6 +435,20 @@ suite("ensureHasStructure", () =>
         assert.ok(true);
     });
 
+    test("should be fine given array with different types and type is any", () =>
+    {
+        const obj = {
+            arr: ["1", 2, { a: 12 }]
+        };
+        
+        given(obj, "obj").ensureHasStructure({
+            "arr": ["any"] 
+        });
+        
+        assert.ok(true);   
+    });
+
+        
     test("should throw ArgumentException given invalid typed array value", () =>
     {
         const structure = {
@@ -572,6 +586,46 @@ suite("ensureHasStructure", () =>
 
         given(obj, "obj").ensureHasStructure(structure);
 
+        assert.ok(true);
+    });
+
+    // any
+    test("should be fine given type is any and value is string", () =>
+    {
+        const obj = {
+            a: "hello"
+        };
+
+        given(obj, "obj").ensureHasStructure({
+            a: "any"
+        });
+        
+        assert.ok(true);
+    });
+
+    test("should be fine given type is any and value is array", () =>
+    {
+        const obj = {
+            a: ["hello"]
+        };
+
+        given(obj, "obj").ensureHasStructure({
+            a: "any"
+        });
+        
+        assert.ok(true);
+    });
+
+    test("should be fine given type is any and value is non-existant", () =>
+    {
+        const obj = {
+            a: null
+        };
+
+        given(obj, "obj").ensureHasStructure({
+            a: "any"
+        });
+        
         assert.ok(true);
     });
 
