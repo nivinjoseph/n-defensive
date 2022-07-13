@@ -51,12 +51,21 @@ export interface FunctionEnsurer extends Ensurer<Function>
 {
     ensureIsFunction(when?: boolean | (() => boolean)): this | never;
 }
+
+type PrimitiveTypeInfo = "string" | "boolean" | "number" | "function" | "array" | "object" | "any";
+type ComplexTypeInfo = Record<string, PrimitiveTypeInfo | ArrayTypeInfo | NestedComplexTypeInfo>;
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+interface NestedComplexTypeInfo extends Record<string, PrimitiveTypeInfo | ArrayTypeInfo | ComplexTypeInfo> {}
+type ArrayTypeInfo = Array<PrimitiveTypeInfo | NestedComplexTypeInfo>;
+export type TypeStructure = NestedComplexTypeInfo;
+
+
 export interface ObjectEnsurer<T extends object> extends Ensurer<T>
 {
     ensureIsObject(when?: boolean | (() => boolean)): this | never;
     ensureIsType(type: new (...args: Array<any>) => T, when?: boolean | (() => boolean)): this | never;
     ensureIsInstanceOf(type: Function & { prototype: T; }, when?: boolean | (() => boolean)): this | never;
-    ensureHasStructure<U extends string | Function | object | Array<U>>(structure: Record<string, U>, when?: boolean | (() => boolean)): this | never;
+    ensureHasStructure(structure: TypeStructure, when?: boolean | (() => boolean)): this | never;
 }
 
 
@@ -302,7 +311,7 @@ class EnsurerInternal<T>
         return this;
     }
     
-    public ensureHasStructure<U extends string | Function | object | Array<U>>(structure: Record<string, U>,
+    public ensureHasStructure(structure: Record<string, TypeStructure>,
         when?: boolean | (() => boolean)): this | never
     {
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
