@@ -24,13 +24,19 @@ export interface ArrayEnsurer<TItem> extends Ensurer<ReadonlyArray<TItem>> {
 export interface FunctionEnsurer extends Ensurer<Function> {
     ensureIsFunction(when?: boolean | (() => boolean)): this | never;
 }
+declare type PrimitiveTypeInfo = "string" | "boolean" | "number" | "function" | "array" | "object" | "any";
+declare type ComplexTypeInfo = Record<string, PrimitiveTypeInfo | ArrayTypeInfo | NestedComplexTypeInfo>;
+interface NestedComplexTypeInfo extends Record<string, PrimitiveTypeInfo | ArrayTypeInfo | ComplexTypeInfo> {
+}
+declare type ArrayTypeInfo = Array<PrimitiveTypeInfo | NestedComplexTypeInfo>;
+export declare type TypeStructure = NestedComplexTypeInfo;
 export interface ObjectEnsurer<T extends object> extends Ensurer<T> {
     ensureIsObject(when?: boolean | (() => boolean)): this | never;
     ensureIsType(type: new (...args: Array<any>) => T, when?: boolean | (() => boolean)): this | never;
     ensureIsInstanceOf(type: Function & {
         prototype: T;
     }, when?: boolean | (() => boolean)): this | never;
-    ensureHasStructure<U extends string | Function | object | Array<U>>(structure: Record<string, U>, when?: boolean | (() => boolean)): this | never;
+    ensureHasStructure(structure: TypeStructure, when?: boolean | (() => boolean)): this | never;
 }
 declare type Nullable<T> = T | null | undefined;
 declare type CondUnionNullable<T> = NonNullable<Nullable<T>>;
