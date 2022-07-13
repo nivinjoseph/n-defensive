@@ -210,23 +210,25 @@ class EnsurerInternal {
             if (name.isEmptyOrWhiteSpace())
                 throw new n_exception_1.ArgumentException("structure", `invalid key specification '${key}'`);
             const fullName = parentName ? `${parentName}.${name}` : name;
-            const value = arg[name];
-            if (value === null || value === undefined) {
-                if (isOptional)
-                    continue;
-                throw new n_exception_1.ArgumentException(this._argName, `is missing required property '${fullName}'`);
-            }
             const typeInfo = schema[key];
             // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             if (typeInfo === null || typeInfo === undefined)
                 throw new n_exception_1.ArgumentException("structure", `null type specification for key '${fullName}'`);
             if (typeof typeInfo !== "string" && typeof typeInfo !== "function" && typeof typeInfo !== "object")
                 throw new n_exception_1.ArgumentException("structure", `invalid type specification '${typeInfo}' for key '${fullName}'`);
+            const value = arg[name];
+            if (value === null || value === undefined) {
+                if (isOptional)
+                    continue;
+                if (typeInfo === "any")
+                    continue;
+                throw new n_exception_1.ArgumentException(this._argName, `is missing required property '${fullName}'`);
+            }
             if (typeof typeInfo === "string") {
                 if (typeInfo.isEmptyOrWhiteSpace())
                     throw new n_exception_1.ArgumentException("structure", `invalid type specification '${typeInfo}' for key '${fullName}'`);
                 const typeName = typeInfo.trim().toLowerCase();
-                const types = ["string", "boolean", "number", "function", "array", "object"];
+                const types = ["string", "boolean", "number", "function", "array", "object", "any"];
                 if (!types.contains(typeName))
                     throw new n_exception_1.ArgumentException("structure", `invalid type specification '${typeInfo}' for key '${fullName}'`);
                 if (typeName === "array") {
@@ -234,6 +236,8 @@ class EnsurerInternal {
                         throw new n_exception_1.ArgumentException(this._argName, `invalid value of type '${typeof value}' for property '${fullName}' of type '${typeName}'`);
                     continue;
                 }
+                if (typeName === "any")
+                    continue;
                 if (typeof value !== typeName)
                     throw new n_exception_1.ArgumentException(this._argName, `invalid value of type '${typeof value}' for property '${fullName}' of type '${typeName}'`);
                 continue;
@@ -251,6 +255,8 @@ class EnsurerInternal {
                 if (typeInfo.length > 1)
                     throw new n_exception_1.ArgumentException("structure", `invalid type specification '${typeInfo}' for key '${fullName}'`);
                 const arrayTypeInfo = typeInfo[0];
+                if (arrayTypeInfo === "any")
+                    continue;
                 const arrayArg = {};
                 const arraySchema = {};
                 value.forEach((val, index) => {

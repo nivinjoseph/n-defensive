@@ -419,22 +419,26 @@ class EnsurerInternal<T>
                 throw new ArgumentException("structure", `invalid key specification '${key}'`);
             const fullName = parentName ? `${parentName}.${name}` : name;
 
+            const typeInfo = schema[key];
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+            if (typeInfo === null || typeInfo === undefined)
+                throw new ArgumentException("structure", `null type specification for key '${fullName}'`);
+
+            if (typeof typeInfo !== "string" && typeof typeInfo !== "function" && typeof typeInfo !== "object")
+                throw new ArgumentException("structure", `invalid type specification '${typeInfo}' for key '${fullName}'`);
+            
             const value = arg[name];
             if (value === null || value === undefined)
             {
                 if (isOptional)
                     continue;
 
+                if (typeInfo === "any")
+                    continue;
+
                 throw new ArgumentException(this._argName, `is missing required property '${fullName}'`);
             }
             
-            const typeInfo = schema[key];
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-            if (typeInfo === null || typeInfo === undefined)
-                throw new ArgumentException("structure", `null type specification for key '${fullName}'`);
-            
-            if (typeof typeInfo !== "string" && typeof typeInfo !== "function" && typeof typeInfo !== "object")
-                throw new ArgumentException("structure", `invalid type specification '${typeInfo}' for key '${fullName}'`);
             
             if (typeof typeInfo === "string")
             {
@@ -443,7 +447,7 @@ class EnsurerInternal<T>
                 
                 const typeName = typeInfo.trim().toLowerCase();
                 
-                const types = ["string", "boolean", "number", "function", "array", "object"];
+                const types = ["string", "boolean", "number", "function", "array", "object", "any"];
                 if (!types.contains(typeName))
                     throw new ArgumentException("structure", `invalid type specification '${typeInfo}' for key '${fullName}'`);
                 
@@ -455,6 +459,9 @@ class EnsurerInternal<T>
                     
                     continue;
                 }    
+                
+                if (typeName === "any")
+                    continue;
                 
                 if (typeof value !== typeName)
                     throw new ArgumentException(this._argName,
@@ -484,6 +491,10 @@ class EnsurerInternal<T>
                     throw new ArgumentException("structure", `invalid type specification '${typeInfo}' for key '${fullName}'`);
                 
                 const arrayTypeInfo = typeInfo[0];
+                        
+                if (arrayTypeInfo === "any")
+                    continue;
+                
                 const arrayArg: Record<string, any> = {};
                 const arraySchema: Record<string, any> = {};
                 value.forEach((val, index) =>
