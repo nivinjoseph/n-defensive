@@ -41,4 +41,5 @@ export interface ObjectEnsurer<T extends object> extends Ensurer<T> {
 declare type Nullable<T> = T | null | undefined;
 declare type CondUnionNullable<T> = NonNullable<Nullable<T>>;
 declare function given<T>(arg: T, argName: string): T extends CondUnionNullable<string> ? StringEnsurer : T extends CondUnionNullable<number> ? NumberEnsurer : T extends CondUnionNullable<boolean> ? BooleanEnsurer : T extends CondUnionNullable<ReadonlyArray<infer U>> ? ArrayEnsurer<U> : T extends CondUnionNullable<Function> ? FunctionEnsurer : T extends CondUnionNullable<object> ? ObjectEnsurer<T> : never;
-export { given };
+declare function ensureNeverReached(value?: never): never;
+export { given, ensureNeverReached };
