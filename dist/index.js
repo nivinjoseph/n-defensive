@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ensureEnumExhaustiveCheck = exports.given = void 0;
+exports.ensureExhaustiveCheck = exports.given = void 0;
 require("@nivinjoseph/n-ext");
 const n_exception_1 = require("@nivinjoseph/n-exception");
 function given(arg, argName) {
@@ -11,11 +11,11 @@ function given(arg, argName) {
     return new EnsurerInternal(arg, argName.trim());
 }
 exports.given = given;
-function ensureEnumExhaustiveCheck(value) {
+function ensureExhaustiveCheck(value) {
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     throw new n_exception_1.ApplicationException(`This should not happen; value: ${value !== null && value !== void 0 ? value : "NONE"}`);
 }
-exports.ensureEnumExhaustiveCheck = ensureEnumExhaustiveCheck;
+exports.ensureExhaustiveCheck = ensureExhaustiveCheck;
 class EnsurerInternal {
     constructor(arg, argName) {
         this._arg = arg;
