@@ -118,13 +118,13 @@ function given<T>(arg: T, argName: string)
     return new EnsurerInternal(arg, argName.trim()) as any;
 }
 
-function ensureEnumExhaustiveCheck(value?: never): never
+function ensureExhaustiveCheck(value: never): never
 {
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     throw new ApplicationException(`This should not happen; value: ${value ?? "NONE"}`);
 }
 
-export { given, ensureEnumExhaustiveCheck };
+export { given, ensureExhaustiveCheck };
     
 
 class EnsurerInternal<T>
