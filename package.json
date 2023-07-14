@@ -41,7 +41,7 @@
     },
     "dependencies": {
         "@nivinjoseph/n-exception": "^1.0.26",
-        "@nivinjoseph/n-ext": "^1.1.35",
+        "@nivinjoseph/n-ext": "^1.1.36",
         "tslib": "^2.4.0"
     }
 }
