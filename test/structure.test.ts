@@ -1,8 +1,9 @@
 import { Exception } from "@nivinjoseph/n-exception";
-import * as assert from "assert";
-import { given } from "../src/index";
+import assert from "node:assert";
+import { describe, test } from "node:test";
+import { given } from "../src/index.js";
 
-suite("ensureHasStructure", () =>
+await describe("ensureHasStructure", async () =>
 {
     // in* = invalid type
     // ne* = null || undefined
@@ -101,7 +102,7 @@ suite("ensureHasStructure", () =>
         }
     };
 
-    test("pushing limits", () =>
+    await test("pushing limits", () =>
     {
         // const arg = { foo: [null]};
         // const structure = { "foo?": ["Function"]};
@@ -117,7 +118,7 @@ suite("ensureHasStructure", () =>
         assert.ok(true);
     });
 
-    test("should be fine if arg is null", () =>
+    await test("should be fine if arg is null", () =>
     {
         const arg: object = null as any;
         const structure = {};
@@ -127,7 +128,7 @@ suite("ensureHasStructure", () =>
         assert.ok(true);
     });
 
-    test("should be fine if arg is undefined", () =>
+    await test("should be fine if arg is undefined", () =>
     {
         const arg: object = undefined as any;
         const structure = {};
@@ -137,7 +138,7 @@ suite("ensureHasStructure", () =>
         assert.ok(true);
     });
 
-    test("should throw ArgumentNullException if structure is null", () =>
+    await test("should throw ArgumentNullException if structure is null", () =>
     {
         const structure: any = null;
 
@@ -145,7 +146,7 @@ suite("ensureHasStructure", () =>
             (exp: Exception) => exp.name === "ArgumentNullException");
     });
 
-    test("should throw ArgumentNullException if structure is undefined", () =>
+    await test("should throw ArgumentNullException if structure is undefined", () =>
     {
         const structure: any = undefined;
 
@@ -153,7 +154,7 @@ suite("ensureHasStructure", () =>
             (exp: Exception) => exp.name === "ArgumentNullException");
     });
 
-    test("should throw ArgumentException if structure has invalid type information", () =>
+    await test("should throw ArgumentException if structure has invalid type information", () =>
     {
         // const structure = { strVal: "sting" };
 
@@ -162,7 +163,7 @@ suite("ensureHasStructure", () =>
     });
 
     // string
-    test("should be fine given valid string value", () =>
+    await test("should be fine given valid string value", () =>
     {
         // const structure = { strVal: "string" };
 
@@ -171,7 +172,7 @@ suite("ensureHasStructure", () =>
         assert.ok(true);
     });
 
-    test("should throw ArgumentException given invalid string value", () =>
+    await test("should throw ArgumentException given invalid string value", () =>
     {
         // const structure = { inStrVal: "string" };
 
@@ -179,7 +180,7 @@ suite("ensureHasStructure", () =>
             (exp: Exception) => exp.name === "ArgumentException");
     });
 
-    test("should throw ArgumentException given non-existant string value", () =>
+    await test("should throw ArgumentException given non-existant string value", () =>
     {
         // const structure = { neStrVal: "string" };
 
@@ -188,7 +189,7 @@ suite("ensureHasStructure", () =>
     });
 
     // optional string
-    test("should be fine given optional valid string value", () =>
+    await test("should be fine given optional valid string value", () =>
     {
         // const structure = { "opStrVal?": "string" };
 
@@ -197,7 +198,7 @@ suite("ensureHasStructure", () =>
         assert.ok(true);
     });
 
-    test("should throw ArgumentException given optional invalid string value", () =>
+    await test("should throw ArgumentException given optional invalid string value", () =>
     {
         // const structure = { "opInStrVal?": "string" };
 
@@ -205,7 +206,7 @@ suite("ensureHasStructure", () =>
             (exp: Exception) => exp.name === "ArgumentException");
     });
 
-    test("should be fine given optional non-existant string value", () =>
+    await test("should be fine given optional non-existant string value", () =>
     {
         // const structure = { "opNeStrVal?": "string" };
 
@@ -215,7 +216,7 @@ suite("ensureHasStructure", () =>
     });
 
     // number
-    test("should be fine given valid number value", () =>
+    await test("should be fine given valid number value", () =>
     {
         // const structure = { numVal: "number" };
 
@@ -224,7 +225,7 @@ suite("ensureHasStructure", () =>
         assert.ok(true);
     });
 
-    test("should throw ArgumentException given invalid number value", () =>
+    await test("should throw ArgumentException given invalid number value", () =>
     {
         // const structure = { inNumVal: "number" };
 
@@ -232,7 +233,7 @@ suite("ensureHasStructure", () =>
             (exp: Exception) => exp.name === "ArgumentException");
     });
 
-    test("should throw ArgumentException given non-existant number value", () =>
+    await test("should throw ArgumentException given non-existant number value", () =>
     {
         // const structure = { neNumVal: "number" };
 
@@ -241,7 +242,7 @@ suite("ensureHasStructure", () =>
     });
 
     // optional number
-    test("should be fine given optional valid number value", () =>
+    await test("should be fine given optional valid number value", () =>
     {
         // const structure = { "opNumVal?": "number" };
 
@@ -250,7 +251,7 @@ suite("ensureHasStructure", () =>
         assert.ok(true);
     });
 
-    test("should throw ArgumentException given optional invalid number value", () =>
+    await test("should throw ArgumentException given optional invalid number value", () =>
     {
         // const structure = { "opInNumVal?": "number" };
 
@@ -258,7 +259,7 @@ suite("ensureHasStructure", () =>
             (exp: Exception) => exp.name === "ArgumentException");
     });
 
-    test("should be fine given optional non-existant number value", () =>
+    await test("should be fine given optional non-existant number value", () =>
     {
         // const structure = { "opNeNumVal?": "number" };
 
@@ -268,7 +269,7 @@ suite("ensureHasStructure", () =>
     });
 
     // boolean
-    test("should be fine given valid boolean value", () =>
+    await test("should be fine given valid boolean value", () =>
     {
         // const structure = { boolVal: "boolean" };
 
@@ -277,7 +278,7 @@ suite("ensureHasStructure", () =>
         assert.ok(true);
     });
 
-    test("should throw ArgumentException given invalid boolean value", () =>
+    await test("should throw ArgumentException given invalid boolean value", () =>
     {
         // const structure = { inBoolVal: "boolean" };
 
@@ -285,7 +286,7 @@ suite("ensureHasStructure", () =>
             (exp: Exception) => exp.name === "ArgumentException");
     });
 
-    test("should throw ArgumentException given non-existant boolean value", () =>
+    await test("should throw ArgumentException given non-existant boolean value", () =>
     {
         // const structure = { neBoolVal: "boolean" };
 
@@ -294,7 +295,7 @@ suite("ensureHasStructure", () =>
     });
 
     // optional boolean
-    test("should be fine given optional valid boolean value", () =>
+    await test("should be fine given optional valid boolean value", () =>
     {
         // const structure = { "opBoolVal?": "boolean" };
 
@@ -303,7 +304,7 @@ suite("ensureHasStructure", () =>
         assert.ok(true);
     });
 
-    test("should throw ArgumentException given optional invalid boolean value", () =>
+    await test("should throw ArgumentException given optional invalid boolean value", () =>
     {
         // const structure = { "opInBoolVal?": "boolean" };
 
@@ -311,7 +312,7 @@ suite("ensureHasStructure", () =>
             (exp: Exception) => exp.name === "ArgumentException");
     });
 
-    test("should be fine given optional non-existant boolean value", () =>
+    await test("should be fine given optional non-existant boolean value", () =>
     {
         // const structure = { "opNeBoolVal?": "boolean" };
 
@@ -321,7 +322,7 @@ suite("ensureHasStructure", () =>
     });
 
     // array
-    test("should be fine given valid array value", () =>
+    await test("should be fine given valid array value", () =>
     {
         // const structure = { arrayVal: "array" };
 
@@ -330,7 +331,7 @@ suite("ensureHasStructure", () =>
         assert.ok(true);
     });
 
-    test("should throw ArgumentException given invalid array value", () =>
+    await test("should throw ArgumentException given invalid array value", () =>
     {
         // const structure = { inArrayVal: "array" };
 
@@ -338,7 +339,7 @@ suite("ensureHasStructure", () =>
             (exp: Exception) => exp.name === "ArgumentException");
     });
 
-    test("should throw ArgumentException given non-existant array value", () =>
+    await test("should throw ArgumentException given non-existant array value", () =>
     {
         // const structure = { neArrayVal: "array" };
 
@@ -347,7 +348,7 @@ suite("ensureHasStructure", () =>
     });
 
     // optional array
-    test("should be fine given optional valid array value", () =>
+    await test("should be fine given optional valid array value", () =>
     {
         // const structure = { "opArrayVal?": "array" };
 
@@ -356,7 +357,7 @@ suite("ensureHasStructure", () =>
         assert.ok(true);
     });
 
-    test("should throw ArgumentException given optional invalid array value", () =>
+    await test("should throw ArgumentException given optional invalid array value", () =>
     {
         // const structure = { "opInArrayVal?": "array" };
 
@@ -364,7 +365,7 @@ suite("ensureHasStructure", () =>
             (exp: Exception) => exp.name === "ArgumentException");
     });
 
-    test("should be fine given optional non-existant array value", () =>
+    await test("should be fine given optional non-existant array value", () =>
     {
         // const structure = { "opNeArrayVal?": "array" };
 
@@ -374,7 +375,7 @@ suite("ensureHasStructure", () =>
     });
 
     // typed array
-    test("should be fine given valid typed array value", () =>
+    await test("should be fine given valid typed array value", () =>
     {
         // const structure = { typedArrayVal: ["number"] };
 
@@ -383,7 +384,7 @@ suite("ensureHasStructure", () =>
         assert.ok(true);
     });
 
-    test("should be fine given array with different types and type is any", () =>
+    await test("should be fine given array with different types and type is any", () =>
     {
         const obj = {
             arr: ["1", 2, { a: 12 }]
@@ -394,8 +395,7 @@ suite("ensureHasStructure", () =>
         assert.ok(true);   
     });
 
-        
-    test("should throw ArgumentException given invalid typed array value", () =>
+    await test("should throw ArgumentException given invalid typed array value", () =>
     {
         // const structure = { inTypedArrayVal: ["boolean"] };
 
@@ -403,7 +403,7 @@ suite("ensureHasStructure", () =>
             (exp: Exception) => exp.name === "ArgumentException");
     });
 
-    test("should throw ArgumentException given non-existant typed array value", () =>
+    await test("should throw ArgumentException given non-existant typed array value", () =>
     {
         // const structure = { neTypedArrayVal: ["object"] };
 
@@ -412,7 +412,7 @@ suite("ensureHasStructure", () =>
     });
 
     // optional array
-    test("should be fine given optional valid typed array value", () =>
+    await test("should be fine given optional valid typed array value", () =>
     {
         // const structure = { "opTypedArrayVal?": ["string"] };
 
@@ -421,7 +421,7 @@ suite("ensureHasStructure", () =>
         assert.ok(true);
     });
 
-    test("should throw ArgumentException given optional invalid typed array value", () =>
+    await test("should throw ArgumentException given optional invalid typed array value", () =>
     {
         // const structure = { "opInTypedArrayVal?": ["number"] };
 
@@ -429,7 +429,7 @@ suite("ensureHasStructure", () =>
             (exp: Exception) => exp.name === "ArgumentException");
     });
 
-    test("should be fine given optional non-existant typed array value", () =>
+    await test("should be fine given optional non-existant typed array value", () =>
     {
         // const structure = { "opNeTypedArrayVal?": ["array"] };
 
@@ -439,7 +439,7 @@ suite("ensureHasStructure", () =>
     });
 
     // object
-    test("should be fine given valid object value", () =>
+    await test("should be fine given valid object value", () =>
     {
         // const structure = { objVal: "object" };
 
@@ -448,7 +448,7 @@ suite("ensureHasStructure", () =>
         assert.ok(true);
     });
 
-    test("should be fine given valid object value and object literal notation", () =>
+    await test("should be fine given valid object value and object literal notation", () =>
     {
         const structure = { objVal: {} };
 
@@ -457,7 +457,7 @@ suite("ensureHasStructure", () =>
         assert.ok(true);
     });
 
-    test("should throw ArgumentException given invalid object value", () =>
+    await test("should throw ArgumentException given invalid object value", () =>
     {
         // const structure = { inObjVal: "object" };
 
@@ -465,7 +465,7 @@ suite("ensureHasStructure", () =>
             (exp: Exception) => exp.name === "ArgumentException");
     });
 
-    test("should throw ArgumentException given non-existant object value", () =>
+    await test("should throw ArgumentException given non-existant object value", () =>
     {
         // const structure = { neObjVal: "object" };
 
@@ -474,7 +474,7 @@ suite("ensureHasStructure", () =>
     });
 
     // optional object
-    test("should be fine given optional valid object value", () =>
+    await test("should be fine given optional valid object value", () =>
     {
         // const structure = { "opObjVal?": "object" };
 
@@ -483,7 +483,7 @@ suite("ensureHasStructure", () =>
         assert.ok(true);
     });
 
-    test("should be fine given optional valid object value and object literal notation", () =>
+    await test("should be fine given optional valid object value and object literal notation", () =>
     {
         const structure = { "opObjVal?": {} };
 
@@ -492,7 +492,7 @@ suite("ensureHasStructure", () =>
         assert.ok(true);
     });
 
-    test("should throw ArgumentException given optional invalid object value", () =>
+    await test("should throw ArgumentException given optional invalid object value", () =>
     {
         // const structure = { "opInObjVal?": "object" };
 
@@ -500,7 +500,7 @@ suite("ensureHasStructure", () =>
             (exp: Exception) => exp.name === "ArgumentException");
     });
 
-    test("should be fine given optional non-existant object value", () =>
+    await test("should be fine given optional non-existant object value", () =>
     {
         const structure: any = {
             "opNeObjVal?": "object"
@@ -512,7 +512,7 @@ suite("ensureHasStructure", () =>
     });
 
     // any
-    test("should be fine given type is any and value is string", () =>
+    await test("should be fine given type is any and value is string", () =>
     {
         const obj = {
             a: "hello"
@@ -525,7 +525,7 @@ suite("ensureHasStructure", () =>
         assert.ok(true);
     });
 
-    test("should be fine given type is any and value is array", () =>
+    await test("should be fine given type is any and value is array", () =>
     {
         const obj = {
             a: ["hello"]
@@ -538,7 +538,7 @@ suite("ensureHasStructure", () =>
         assert.ok(true);
     });
 
-    test("should be fine given type is any and value is non-existant", () =>
+    await test("should be fine given type is any and value is non-existant", () =>
     {
         const obj = {
             a: null
@@ -552,7 +552,7 @@ suite("ensureHasStructure", () =>
     });
 
     // nested
-    test("should throw ArgumentException if structure has invalid type information", () =>
+    await test("should throw ArgumentException if structure has invalid type information", () =>
     {
         // const structure = {
         //     nesObjVal: {
@@ -569,7 +569,7 @@ suite("ensureHasStructure", () =>
     });
 
     // nested string
-    test("should be fine given valid nested string value", () =>
+    await test("should be fine given valid nested string value", () =>
     {
         let structure: any = {
             strVal: "string"
@@ -584,7 +584,7 @@ suite("ensureHasStructure", () =>
         assert.ok(true);
     });
 
-    test("should throw ArgumentException given nested invalid string value", () =>
+    await test("should throw ArgumentException given nested invalid string value", () =>
     {
         let structure: any = {
             inStrVal: "string"
@@ -598,7 +598,7 @@ suite("ensureHasStructure", () =>
             (exp: Exception) => exp.name === "ArgumentException");
     });
 
-    test("should throw ArgumentException given nested non-existant string value", () =>
+    await test("should throw ArgumentException given nested non-existant string value", () =>
     {
         let structure: any = {
             neStrVal: "string"
@@ -613,7 +613,7 @@ suite("ensureHasStructure", () =>
     });
 
     // optional string
-    test("should be fine given nested optional valid string value", () =>
+    await test("should be fine given nested optional valid string value", () =>
     {
         let structure: any = {
             "opStrVal?": "string"
@@ -628,7 +628,7 @@ suite("ensureHasStructure", () =>
         assert.ok(true);
     });
 
-    test("should throw ArgumentException given nested optional invalid string value", () =>
+    await test("should throw ArgumentException given nested optional invalid string value", () =>
     {
         let structure: any = {
             "opInStrVal?": "string"
@@ -642,7 +642,7 @@ suite("ensureHasStructure", () =>
             (exp: Exception) => exp.name === "ArgumentException");
     });
 
-    test("should be fine given nested optional non-existant string value", () =>
+    await test("should be fine given nested optional non-existant string value", () =>
     {
         let structure: any = {
             "opNeStrVal?": "string"
@@ -658,7 +658,7 @@ suite("ensureHasStructure", () =>
     });
 
     // number
-    test("should be fine given nested valid number value", () =>
+    await test("should be fine given nested valid number value", () =>
     {
         let structure: any = {
             numVal: "number"
@@ -673,7 +673,7 @@ suite("ensureHasStructure", () =>
         assert.ok(true);
     });
 
-    test("should throw ArgumentException given nested invalid number value", () =>
+    await test("should throw ArgumentException given nested invalid number value", () =>
     {
         let structure: any = {
             inNumVal: "number"
@@ -687,7 +687,7 @@ suite("ensureHasStructure", () =>
             (exp: Exception) => exp.name === "ArgumentException");
     });
 
-    test("should throw ArgumentException given nested non-existant number value", () =>
+    await test("should throw ArgumentException given nested non-existant number value", () =>
     {
         let structure: any = {
             neNumVal: "number"
@@ -702,7 +702,7 @@ suite("ensureHasStructure", () =>
     });
 
     // optional number
-    test("should be fine given nested optional valid number value", () =>
+    await test("should be fine given nested optional valid number value", () =>
     {
         let structure: any = {
             "opNumVal?": "number"
@@ -717,7 +717,7 @@ suite("ensureHasStructure", () =>
         assert.ok(true);
     });
 
-    test("should throw ArgumentException given nested optional invalid number value", () =>
+    await test("should throw ArgumentException given nested optional invalid number value", () =>
     {
         let structure: any = {
             "opInNumVal?": "number"
@@ -731,7 +731,7 @@ suite("ensureHasStructure", () =>
             (exp: Exception) => exp.name === "ArgumentException");
     });
 
-    test("should be fine given nested optional non-existant number value", () =>
+    await test("should be fine given nested optional non-existant number value", () =>
     {
         let structure: any = {
             "opNeNumVal?": "number"
@@ -747,7 +747,7 @@ suite("ensureHasStructure", () =>
     });
 
     // boolean
-    test("should be fine given nested valid boolean value", () =>
+    await test("should be fine given nested valid boolean value", () =>
     {
         let structure: any = {
             boolVal: "boolean"
@@ -762,7 +762,7 @@ suite("ensureHasStructure", () =>
         assert.ok(true);
     });
 
-    test("should throw ArgumentException given nested invalid boolean value", () =>
+    await test("should throw ArgumentException given nested invalid boolean value", () =>
     {
         let structure: any = {
             inBoolVal: "boolean"
@@ -776,7 +776,7 @@ suite("ensureHasStructure", () =>
             (exp: Exception) => exp.name === "ArgumentException");
     });
 
-    test("should throw ArgumentException given nested non-existant boolean value", () =>
+    await test("should throw ArgumentException given nested non-existant boolean value", () =>
     {
         let structure: any = {
             neBoolVal: "boolean"
@@ -791,7 +791,7 @@ suite("ensureHasStructure", () =>
     });
 
     // optional boolean
-    test("should be fine given nested optional valid boolean value", () =>
+    await test("should be fine given nested optional valid boolean value", () =>
     {
         let structure: any = {
             "opBoolVal?": "boolean"
@@ -806,7 +806,7 @@ suite("ensureHasStructure", () =>
         assert.ok(true);
     });
 
-    test("should throw ArgumentException given nested optional invalid boolean value", () =>
+    await test("should throw ArgumentException given nested optional invalid boolean value", () =>
     {
         let structure: any = {
             "opInBoolVal?": "boolean"
@@ -820,7 +820,7 @@ suite("ensureHasStructure", () =>
             (exp: Exception) => exp.name === "ArgumentException");
     });
 
-    test("should be fine given nested optional non-existant boolean value", () =>
+    await test("should be fine given nested optional non-existant boolean value", () =>
     {
         let structure: any = {
             "opNeBoolVal?": "boolean"
@@ -836,7 +836,7 @@ suite("ensureHasStructure", () =>
     });
 
     // object
-    test("should be fine given nested valid object value", () =>
+    await test("should be fine given nested valid object value", () =>
     {
         let structure: any = {
             objVal: "object"
@@ -851,7 +851,7 @@ suite("ensureHasStructure", () =>
         assert.ok(true);
     });
 
-    test("should be fine given nested valid object value and object literal notation", () =>
+    await test("should be fine given nested valid object value and object literal notation", () =>
     {
         let structure: any = {
             objVal: {}
@@ -866,7 +866,7 @@ suite("ensureHasStructure", () =>
         assert.ok(true);
     });
 
-    test("should throw ArgumentException given nested invalid object value", () =>
+    await test("should throw ArgumentException given nested invalid object value", () =>
     {
         let structure: any = {
             inObjVal: "object"
@@ -880,7 +880,7 @@ suite("ensureHasStructure", () =>
             (exp: Exception) => exp.name === "ArgumentException");
     });
 
-    test("should throw ArgumentException given nested non-existant object value", () =>
+    await test("should throw ArgumentException given nested non-existant object value", () =>
     {
         let structure: any = {
             neObjVal: "object"
@@ -895,7 +895,7 @@ suite("ensureHasStructure", () =>
     });
 
     // optional object
-    test("should be fine given nested optional valid object value", () =>
+    await test("should be fine given nested optional valid object value", () =>
     {
         let structure: any = {
             "opObjVal?": "object"
@@ -910,7 +910,7 @@ suite("ensureHasStructure", () =>
         assert.ok(true);
     });
 
-    test("should be fine given nested optional valid object value and object literal notation", () =>
+    await test("should be fine given nested optional valid object value and object literal notation", () =>
     {
         let structure: any = {
             "opObjVal?": {}
@@ -925,7 +925,7 @@ suite("ensureHasStructure", () =>
         assert.ok(true);
     });
 
-    test("should throw ArgumentException given nested optional invalid object value", () =>
+    await test("should throw ArgumentException given nested optional invalid object value", () =>
     {
         let structure: any = {
             "opInObjVal?": "object"
@@ -939,7 +939,7 @@ suite("ensureHasStructure", () =>
             (exp: Exception) => exp.name === "ArgumentException");
     });
 
-    test("should be fine given nested optional non-existant object value", () =>
+    await test("should be fine given nested optional non-existant object value", () =>
     {
         let structure: any = {
             "opNeObjVal?": "object"
