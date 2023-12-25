@@ -37,8 +37,8 @@
         "typescript": "^5.3.3"
     },
     "dependencies": {
-        "@nivinjoseph/n-exception": "^1.0.26",
-        "@nivinjoseph/n-ext": "^1.1.36",
+        "@nivinjoseph/n-exception": "^2.0.1",
+        "@nivinjoseph/n-ext": "^2.0.1",
         "tslib": "^2.6.2"
     },
     "engines": {

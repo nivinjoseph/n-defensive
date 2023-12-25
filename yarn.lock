@@ -83,8 +83,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@nivinjoseph/n-defensive@workspace:."
   dependencies:
-    "@nivinjoseph/n-exception": "npm:^1.0.26"
-    "@nivinjoseph/n-ext": "npm:^1.1.36"
+    "@nivinjoseph/n-exception": "npm:^2.0.1"
+    "@nivinjoseph/n-ext": "npm:^2.0.1"
     "@types/node": "npm:^20.10"
     "@typescript-eslint/eslint-plugin": "npm:^6.15.0"
     "@typescript-eslint/parser": "npm:^6.15.0"
@@ -95,23 +95,23 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@nivinjoseph/n-exception@npm:^1.0.26":
-  version: 1.0.26
-  resolution: "@nivinjoseph/n-exception@npm:1.0.26"
+"@nivinjoseph/n-exception@npm:^2.0.1":
+  version: 2.0.1
+  resolution: "@nivinjoseph/n-exception@npm:2.0.1"
   dependencies:
-    "@nivinjoseph/n-ext": "npm:^1.1.35"
-    tslib: "npm:^2.4.0"
-  checksum: 96118f6a866093add3e9754c9ee7fa9407bdd52f66e1fd8927791ae2d58b28847a9dd59a40c7653ce835586b3f836b489150c06f8465456e034a4e3a066965e6
+    "@nivinjoseph/n-ext": "npm:^2.0.1"
+    tslib: "npm:^2.6.2"
+  checksum: 8555f8890f5b8e06d8bc248ec40ac7cca9f0308574c359aadacec7e57081d7adb8baa8c2d1bda10643a56f5db9c020c348fee49d1b4eedfa01fb2966599aa060
   languageName: node
   linkType: hard
 
-"@nivinjoseph/n-ext@npm:^1.1.35, @nivinjoseph/n-ext@npm:^1.1.36":
-  version: 1.1.36
-  resolution: "@nivinjoseph/n-ext@npm:1.1.36"
+"@nivinjoseph/n-ext@npm:^2.0.1":
+  version: 2.0.1
+  resolution: "@nivinjoseph/n-ext@npm:2.0.1"
   dependencies:
     buffer: "npm:^6.0.3"
-    tslib: "npm:^2.4.0"
-  checksum: 3b64b93eb6483c7b8c411f64408909be6c58fe96003e5a31a92b4adc6e61f674cf8053893c615756c4f82ab8f47682396ce766e1e475e6d7bc739e70346a3eed
+    tslib: "npm:^2.6.2"
+  checksum: 5e479aae765e7af803feb4ee20fba3997fb2916fe09425541f086345f9ae301c2af9186d2e93077751c01b4d7179cba772eb3473566f7f0ed231df23fca0e391
   languageName: node
   linkType: hard
 
@@ -1199,7 +1199,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tslib@npm:^2.4.0, tslib@npm:^2.6.2":
+"tslib@npm:^2.6.2":
   version: 2.6.2
   resolution: "tslib@npm:2.6.2"
   checksum: e03a8a4271152c8b26604ed45535954c0a45296e32445b4b87f8a5abdb2421f40b59b4ca437c4346af0f28179780d604094eb64546bee2019d903d01c6c19bdb
