@@ -8,6 +8,6 @@ export class Bar extends Foo
     //     super();
     //     this.baz = "I am baz";
     // }
- }
+}
 
 export class Zax { }

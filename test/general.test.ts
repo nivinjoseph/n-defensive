@@ -1,9 +1,10 @@
 import { ArgumentNullException } from "@nivinjoseph/n-exception";
-import * as assert from "assert";
-import { given } from "../src/index";
+import assert from "node:assert";
+import { before, beforeEach, describe, test } from "node:test";
+import { given } from "../src/index.js";
 
 
-suite("General", () =>
+await describe("General", async () =>
 {
     // let arg: any;
     // let argName: any;
@@ -11,17 +12,17 @@ suite("General", () =>
     let exceptionType: string;
     let reason: any;
 
-    setup(() =>
+    beforeEach(() =>
     {
         // arg = null;
         // argName = null;
         exceptionHappened = false;
         reason = null;
     });
-    
-    suite("given", () =>
+
+    await describe("given", async () =>
     {
-        test("should throw an ArgumentNullException if argName (second arg) is null", () => 
+        await test("should throw an ArgumentNullException if argName (second arg) is null", () => 
         {
             assert.throws(() =>
             {
@@ -29,7 +30,7 @@ suite("General", () =>
             }, ArgumentNullException);
         });
 
-        test("should throw an ArgumentNullException if argName (second arg) is undefined", () =>
+        await test("should throw an ArgumentNullException if argName (second arg) is undefined", () =>
         {
             assert.throws(() =>
             {
@@ -37,7 +38,7 @@ suite("General", () =>
             }, ArgumentNullException);
         });
 
-        test("should throw an ArgumentNullException if argName (second arg) is an empty string", () =>
+        await test("should throw an ArgumentNullException if argName (second arg) is an empty string", () =>
         {
             assert.throws(() =>
             {
@@ -45,7 +46,7 @@ suite("General", () =>
             }, ArgumentNullException);
         });
 
-        test("should throw an ArgumentNullException if argName (second arg) is an whitespace string", () =>
+        await test("should throw an ArgumentNullException if argName (second arg) is an whitespace string", () =>
         {
             assert.throws(() =>
             {
@@ -53,7 +54,7 @@ suite("General", () =>
             }, ArgumentNullException);
         });
 
-        test("given should return an Ensurer object", () =>
+        await test("given should return an Ensurer object", () =>
         {
             const ensurer = given({}, "argName");
 
@@ -61,10 +62,10 @@ suite("General", () =>
             assert.ok(ensurer != null);
         });
     });
-    
-    suite("ensureHasValue", () =>     
+
+    await describe("ensureHasValue", async () =>     
     {
-        test("should throw ArgumentNullException if arg is null", () =>
+        await test("should throw ArgumentNullException if arg is null", () =>
         {
             try 
             {
@@ -79,7 +80,7 @@ suite("General", () =>
             assert.strictEqual(exceptionType, "ArgumentNullException");
         });
 
-        test("should throw ArgumentNullException if arg is undefined", () =>
+        await test("should throw ArgumentNullException if arg is undefined", () =>
         {
             // arg = undefined;
             try 
@@ -95,7 +96,7 @@ suite("General", () =>
             assert.strictEqual(exceptionType, "ArgumentNullException");
         });
 
-        test("should throw ArgumentException if arg is empty string", () =>
+        await test("should throw ArgumentException if arg is empty string", () =>
         {
             // arg = "";
             // argName = "argName";
@@ -112,7 +113,7 @@ suite("General", () =>
             assert.strictEqual(exceptionType, "ArgumentException");
         });
 
-        test("should throw ArgumentException if arg is whitespace string", () =>
+        await test("should throw ArgumentException if arg is whitespace string", () =>
         {
             // arg = "   ";
             // argName = "argName";
@@ -129,7 +130,7 @@ suite("General", () =>
             assert.strictEqual(exceptionType, "ArgumentException");
         });
 
-        test("should not throw any exceptions if arg has value", () =>
+        await test("should not throw any exceptions if arg has value", () =>
         {
             // arg = "arg";
             // argName = "argName";
@@ -145,19 +146,19 @@ suite("General", () =>
             assert.strictEqual(exceptionHappened, false);
         });
     });
-    
-    suite("ensure", () =>
+
+    await describe("ensure", async () =>
     {
         const arg = "arg";
         const argName = "argName";
 
-        setup(() =>
+        before(() =>
         {
             // arg = "arg";
             // argName = "argName";
         });
 
-        test("should throw ArgumentNullException if func is null", () =>
+        await test("should throw ArgumentNullException if func is null", async () =>
         {
             try 
             {
@@ -172,7 +173,7 @@ suite("General", () =>
             assert.strictEqual(exceptionType, "ArgumentNullException");
         });
 
-        test("should throw ArgumentNullException if func is undefined", () =>
+        await test("should throw ArgumentNullException if func is undefined", () =>
         {
             try 
             {
@@ -187,7 +188,7 @@ suite("General", () =>
             assert.strictEqual(exceptionType, "ArgumentNullException");
         });
 
-        test("should throw InvalidArgumentException if func returns false", () =>
+        await test("should throw InvalidArgumentException if func returns false", () =>
         {
             try 
             {
@@ -203,7 +204,7 @@ suite("General", () =>
             assert.strictEqual(exceptionType, "InvalidArgumentException");
         });
 
-        test("should not throw any exceptions if the func returns true", () =>
+        await test("should not throw any exceptions if the func returns true", () =>
         {
             try 
             {
@@ -218,8 +219,8 @@ suite("General", () =>
             assert.strictEqual(exceptionHappened, false);
         });
     });
-    
-    suite("ensure with reason", () =>
+
+    await describe("ensure with reason", async () =>
     {
         const arg = "arg";
         const argName = "argName";
@@ -229,7 +230,7 @@ suite("General", () =>
 
         // });
 
-        test("should throw InvalidArgumentException if func returns false and reason is null", () =>
+        await test("should throw InvalidArgumentException if func returns false and reason is null", () =>
         {
             try 
             {
@@ -244,7 +245,7 @@ suite("General", () =>
             assert.strictEqual(exceptionType, "InvalidArgumentException");
         });
 
-        test("should throw InvalidArgumentException if func returns false and reason is undefined", () =>
+        await test("should throw InvalidArgumentException if func returns false and reason is undefined", () =>
         {
             reason = undefined;
             try 
@@ -260,7 +261,7 @@ suite("General", () =>
             assert.strictEqual(exceptionType, "InvalidArgumentException");
         });
 
-        test("should throw InvalidArgumentException if func returns false and reason is empty string", () =>
+        await test("should throw InvalidArgumentException if func returns false and reason is empty string", () =>
         {
             reason = "";
             try 
@@ -276,7 +277,7 @@ suite("General", () =>
             assert.strictEqual(exceptionType, "InvalidArgumentException");
         });
 
-        test("should throw InvalidArgumentException if func returns false and reason is whitespace string", () =>
+        await test("should throw InvalidArgumentException if func returns false and reason is whitespace string", () =>
         {
             reason = "  ";
             try 
@@ -292,7 +293,7 @@ suite("General", () =>
             assert.strictEqual(exceptionType, "InvalidArgumentException");
         });
 
-        test("should throw ArgumentException if func returns false and reason is a valid string", () =>
+        await test("should throw ArgumentException if func returns false and reason is a valid string", () =>
         {
             reason = "reason";
             try 
