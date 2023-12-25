@@ -24,12 +24,12 @@ export interface ArrayEnsurer<TItem> extends Ensurer<ReadonlyArray<TItem>> {
 export interface FunctionEnsurer extends Ensurer<Function> {
     ensureIsFunction(when?: boolean | (() => boolean)): this | never;
 }
-declare type PrimitiveTypeInfo = "string" | "boolean" | "number" | "function" | "array" | "object" | "any";
-declare type ComplexTypeInfo = Record<string, PrimitiveTypeInfo | ArrayTypeInfo | NestedComplexTypeInfo>;
+type PrimitiveTypeInfo = "string" | "boolean" | "number" | "function" | "array" | "object" | "any";
+type ComplexTypeInfo = Record<string, PrimitiveTypeInfo | ArrayTypeInfo | NestedComplexTypeInfo>;
 interface NestedComplexTypeInfo extends Record<string, PrimitiveTypeInfo | ArrayTypeInfo | ComplexTypeInfo> {
 }
-declare type ArrayTypeInfo = Array<PrimitiveTypeInfo | NestedComplexTypeInfo>;
-export declare type TypeStructure = NestedComplexTypeInfo;
+type ArrayTypeInfo = Array<PrimitiveTypeInfo | NestedComplexTypeInfo>;
+export type TypeStructure = NestedComplexTypeInfo;
 export interface ObjectEnsurer<T extends object> extends Ensurer<T> {
     ensureIsObject(when?: boolean | (() => boolean)): this | never;
     ensureIsType(type: new (...args: Array<any>) => T, when?: boolean | (() => boolean)): this | never;
@@ -38,8 +38,9 @@ export interface ObjectEnsurer<T extends object> extends Ensurer<T> {
     }, when?: boolean | (() => boolean)): this | never;
     ensureHasStructure(structure: TypeStructure, when?: boolean | (() => boolean)): this | never;
 }
-declare type Nullable<T> = T | null | undefined;
-declare type CondUnionNullable<T> = NonNullable<Nullable<T>>;
+type Nullable<T> = T | null | undefined;
+type CondUnionNullable<T> = NonNullable<Nullable<T>>;
 declare function given<T>(arg: T, argName: string): T extends CondUnionNullable<string> ? StringEnsurer : T extends CondUnionNullable<number> ? NumberEnsurer : T extends CondUnionNullable<boolean> ? BooleanEnsurer : T extends CondUnionNullable<ReadonlyArray<infer U>> ? ArrayEnsurer<U> : T extends CondUnionNullable<Function> ? FunctionEnsurer : T extends CondUnionNullable<object> ? ObjectEnsurer<T> : never;
 declare function ensureExhaustiveCheck(value: never): never;
 export { given, ensureExhaustiveCheck };
+//# sourceMappingURL=index.d.ts.map
