@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import "@nivinjoseph/n-ext";
 import  
 {
@@ -291,7 +290,7 @@ class EnsurerInternal<T>
         if (!this._canExecute(when))
             return this;
         
-        if (this._arg == null || this._arg === undefined)
+        if (this._arg === null || this._arg === undefined)
             return this;
         
         const typeName = (<Object>type).getTypeName();
@@ -310,7 +309,7 @@ class EnsurerInternal<T>
         if (!this._canExecute(when))
             return this;
 
-        if (this._arg == null || this._arg === undefined)
+        if (this._arg === null || this._arg === undefined)
             return this;
 
         if (!(this._arg instanceof type))
@@ -329,7 +328,7 @@ class EnsurerInternal<T>
         if (!this._canExecute(when))
             return this;
         
-        if (this._arg == null || this._arg === undefined)
+        if (this._arg === null || this._arg === undefined)
             return this;
         
         this._ensureHasStructure(this._arg, structure);
@@ -345,7 +344,7 @@ class EnsurerInternal<T>
         if (func === null || func === undefined)
             throw new ArgumentNullException("func");    
         
-        if (this._arg == null || this._arg === undefined)
+        if (this._arg === null || this._arg === undefined)
             return this;
         
         let result;
@@ -386,7 +385,7 @@ class EnsurerInternal<T>
         if (!this._canExecute(when))
             return this;
 
-        if (this._arg == null || this._arg === undefined)
+        if (this._arg === null || this._arg === undefined)
             return this;
 
         if (!func(this._arg))
