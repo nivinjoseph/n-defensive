@@ -150,5 +150,8 @@ The library throws various exceptions from `@nivinjoseph/n-exception`:
 - `InvalidOperationException`: When an operation is invalid
 - `ApplicationException`: When an unexpected error occurs
 
+## Contributing
+Contributions are welcome! Please follow the existing code style and include tests for new features.
+
 ## License
-MIT
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
