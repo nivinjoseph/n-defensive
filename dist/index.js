@@ -1,5 +1,12 @@
 import "@nivinjoseph/n-ext";
 import { ApplicationException, ArgumentException, ArgumentNullException, InvalidArgumentException, InvalidOperationException } from "@nivinjoseph/n-exception";
+/**
+ * Creates an Ensurer instance for a given value
+ * @param arg - The value to ensure
+ * @param argName - The name of the argument for error messages
+ * @returns An appropriate Ensurer instance based on the value type
+ * @throws {ArgumentNullException} When argName is null or empty
+ */
 function given(arg, argName) {
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (argName == null || argName.isEmptyOrWhiteSpace())
@@ -7,6 +14,51 @@ function given(arg, argName) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return new EnsurerInternal(arg, argName.trim());
 }
+/**
+ * Ensures exhaustive type checking in switch statements
+ * @param value - The value that should be of type never
+ * @throws {ApplicationException} When the value is not of type never
+ * @example
+ * ```typescript
+ * type Status = "active" | "inactive" | "pending";
+ *
+ * function handleStatus(status: Status): string {
+ *   switch (status) {
+ *     case "active":
+ *       return "User is active";
+ *     case "inactive":
+ *       return "User is inactive";
+ *     case "pending":
+ *       return "User is pending";
+ *     default:
+ *       // This ensures we've handled all possible cases
+ *       // If we add a new status to the type, TypeScript will error here
+ *       return ensureExhaustiveCheck(status);
+ *   }
+ * }
+ *
+ * // Example with enum
+ * enum Color {
+ *   Red = "RED",
+ *   Green = "GREEN",
+ *   Blue = "BLUE"
+ * }
+ *
+ * function getColorHex(color: Color): string {
+ *   switch (color) {
+ *     case Color.Red:
+ *       return "#FF0000";
+ *     case Color.Green:
+ *       return "#00FF00";
+ *     case Color.Blue:
+ *       return "#0000FF";
+ *     default:
+ *       // Ensures we've handled all enum values
+ *       return ensureExhaustiveCheck(color);
+ *   }
+ * }
+ * ```
+ */
 function ensureExhaustiveCheck(value) {
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     throw new ApplicationException(`This should not happen; value: ${value !== null && value !== void 0 ? value : "NONE"}`);
