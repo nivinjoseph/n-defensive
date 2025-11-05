@@ -150,7 +150,7 @@ export interface FunctionEnsurer extends Ensurer<Function>
 
 type PrimitiveTypeInfo = "string" | "boolean" | "number" | "function" | "array" | "object" | "any";
 type ComplexTypeInfo = Record<string, PrimitiveTypeInfo | ArrayTypeInfo | NestedComplexTypeInfo>;
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface NestedComplexTypeInfo extends Record<string, PrimitiveTypeInfo | ArrayTypeInfo | ComplexTypeInfo> { }
 type ArrayTypeInfo = Array<PrimitiveTypeInfo | NestedComplexTypeInfo>;
 export type TypeStructure = NestedComplexTypeInfo;

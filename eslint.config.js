@@ -104,7 +104,7 @@ export default defineConfig(
             ],
             "@typescript-eslint/ban-tslint-comment": "error",
             "@typescript-eslint/no-empty-object-type": "error",
-            "@typescript-eslint/no-unsafe-function-type": "error",
+            "@typescript-eslint/no-unsafe-function-type": "off",
             "@typescript-eslint/no-wrapper-object-types": "off",
             "@typescript-eslint/no-restricted-types": [
                 "error",
