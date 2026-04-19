@@ -149,10 +149,11 @@ export interface FunctionEnsurer extends Ensurer<Function>
 }
 
 type PrimitiveTypeInfo = "string" | "boolean" | "number" | "function" | "array" | "object" | "any";
-type ComplexTypeInfo = Record<string, PrimitiveTypeInfo | ArrayTypeInfo | NestedComplexTypeInfo>;
+type ConstructorTypeInfo = new (...args: Array<any>) => object;
+type ComplexTypeInfo = Record<string, PrimitiveTypeInfo | ConstructorTypeInfo | ArrayTypeInfo | NestedComplexTypeInfo>;
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-interface NestedComplexTypeInfo extends Record<string, PrimitiveTypeInfo | ArrayTypeInfo | ComplexTypeInfo> { }
-type ArrayTypeInfo = Array<PrimitiveTypeInfo | NestedComplexTypeInfo>;
+interface NestedComplexTypeInfo extends Record<string, PrimitiveTypeInfo | ConstructorTypeInfo | ArrayTypeInfo | ComplexTypeInfo> { }
+type ArrayTypeInfo = Array<PrimitiveTypeInfo | ConstructorTypeInfo | NestedComplexTypeInfo>;
 export type TypeStructure = NestedComplexTypeInfo;
 
 
@@ -268,6 +269,16 @@ export interface ObjectEnsurer<T extends object> extends Ensurer<T>
      * const shouldValidate = true;
      * given({ name: "John" }, "person")
      *   .ensureHasStructure(personStructure, () => shouldValidate); // only validates if shouldValidate is true
+     *
+     * // With a constructor — validates the value is an instance of the class (via instanceof)
+     * class Address { street!: string; city!: string; }
+     * const personWithAddressClass = {
+     *   name: "string",
+     *   address: Address,           // must be an Address instance
+     *   "pets?": [Animal]           // optional array of Animal instances
+     * };
+     * given({ name: "John", address: new Address() }, "person")
+     *   .ensureHasStructure(personWithAddressClass); // passes
      * ```
      */
     ensureHasStructure(structure: TypeStructure, when?: boolean | (() => boolean)): this | never;
@@ -486,7 +497,7 @@ class EnsurerInternal<T>
         if (this._arg === null || this._arg === undefined)
             return this;
 
-        if (typeof this._arg !== "object")
+        if (typeof this._arg !== "object" || Array.isArray(this._arg))
             throw new ArgumentException(this._argName, "must be object");
 
         return this;
@@ -574,7 +585,7 @@ class EnsurerInternal<T>
         return this;
     }
 
-    public ensureHasStructure(structure: Record<string, TypeStructure>,
+    public ensureHasStructure(structure: TypeStructure,
         when?: boolean | (() => boolean)): this | never
     {
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -586,6 +597,9 @@ class EnsurerInternal<T>
 
         if (this._arg === null || this._arg === undefined)
             return this;
+
+        if (typeof this._arg !== "object")
+            throw new ArgumentException(this._argName, `must be an object to validate structure, got '${typeof this._arg}'`);
 
         this._ensureHasStructure(this._arg, structure);
 
@@ -649,7 +663,7 @@ class EnsurerInternal<T>
             if (this._argName.toLowerCase() === "this")
                 throw new InvalidOperationException(reason != null && !reason.isEmptyOrWhiteSpace() ? reason.trim() : "current operation on instance");
 
-            throw reason != null && !reason.isEmptyOrWhiteSpace()
+            throw reason != null && reason.isNotEmptyOrWhiteSpace()
                 ? new ArgumentException(this._argName, reason.trim())
                 : new InvalidArgumentException(this._argName);
         }
@@ -697,7 +711,7 @@ class EnsurerInternal<T>
                 throw new ArgumentException("structure", `null type specification for key '${fullName}'`);
 
             if (typeof typeInfo !== "string" && typeof typeInfo !== "function" && typeof typeInfo !== "object")
-                throw new ArgumentException("structure", `invalid type specification '${typeInfo}' for key '${fullName}'`);
+                throw new ArgumentException("structure", `invalid type specification '${this._formatTypeInfo(typeInfo)}' for key '${fullName}'`);
 
             const value = arg[name];
             if (value === null || value === undefined)
@@ -715,13 +729,13 @@ class EnsurerInternal<T>
             if (typeof typeInfo === "string")
             {
                 if (typeInfo.isEmptyOrWhiteSpace())
-                    throw new ArgumentException("structure", `invalid type specification '${typeInfo}' for key '${fullName}'`);
+                    throw new ArgumentException("structure", `invalid type specification '${this._formatTypeInfo(typeInfo)}' for key '${fullName}'`);
 
                 const typeName = typeInfo.trim().toLowerCase();
 
                 const types = ["string", "boolean", "number", "function", "array", "object", "any"];
                 if (!types.contains(typeName))
-                    throw new ArgumentException("structure", `invalid type specification '${typeInfo}' for key '${fullName}'`);
+                    throw new ArgumentException("structure", `invalid type specification '${this._formatTypeInfo(typeInfo)}' for key '${fullName}'`);
 
                 if (typeName === "array")
                 {
@@ -760,7 +774,7 @@ class EnsurerInternal<T>
                     continue;
 
                 if (typeInfo.length > 1)
-                    throw new ArgumentException("structure", `invalid type specification '${typeInfo}' for key '${fullName}'`);
+                    throw new ArgumentException("structure", `invalid type specification '${this._formatTypeInfo(typeInfo)}' for key '${fullName}'`);
 
                 const arrayTypeInfo = typeInfo[0];
 
@@ -791,8 +805,28 @@ class EnsurerInternal<T>
                 continue;
             }
 
-            throw new ArgumentException("structure", `invalid type specification '${typeInfo}' for key '${fullName}'`);
+            throw new ArgumentException("structure", `invalid type specification '${this._formatTypeInfo(typeInfo)}' for key '${fullName}'`);
         }
+    }
+
+    private _formatTypeInfo(typeInfo: unknown): string
+    {
+        if (typeInfo === null || typeInfo === undefined)
+            return String(typeInfo);
+
+        if (typeof typeInfo === "string")
+            return typeInfo;
+
+        if (typeof typeInfo === "function")
+            return (<Object>typeInfo).getTypeName();
+
+        if (typeof typeInfo === "object")
+        {
+            try { return JSON.stringify(typeInfo); }
+            catch { return Object.prototype.toString.call(typeInfo); }
+        }
+
+        return String(typeInfo);
     }
 
     // private _getTypeName(typeInfo: any, fullName: string): string
@@ -861,7 +895,7 @@ class EnsurerInternal<T>
         value = (<object>value).toString().trim();
         if (value.length === 0)
             return false;
-        const parsed = +(<object>value).toString().trim();
+        const parsed = +(<object>value);
         return !isNaN(parsed) && isFinite(parsed);
     }
 

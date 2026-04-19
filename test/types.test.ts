@@ -190,6 +190,18 @@ await describe("Types", async () =>
                     }, typeof value);
                 });
         });
+
+        await test("should throw ArgumentException if the value is an array", () =>
+        {
+            [[], [1, 2, 3], new Array<any>()]
+                .forEach(value =>
+                {
+                    assert.throws(() =>
+                    {
+                        given(value as unknown as object, "value").ensureIsObject();
+                    }, ArgumentException);
+                });
+        });
     });
 
     await describe("ensureIsFunction", async () =>

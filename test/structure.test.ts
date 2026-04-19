@@ -2,6 +2,7 @@ import { Exception } from "@nivinjoseph/n-exception";
 import assert from "node:assert";
 import { describe, test } from "node:test";
 import { given } from "../src/index.js";
+import { Bar, Foo, Zax } from "./helpers.js";
 
 await describe("ensureHasStructure", async () =>
 {
@@ -952,5 +953,74 @@ await describe("ensureHasStructure", async () =>
         given(obj, "obj").ensureHasStructure(structure);
 
         assert.ok(true);
+    });
+
+    // constructor schema values
+    await test("should be fine given value is an instance of the constructor schema value", () =>
+    {
+        const arg = { pet: new Foo() };
+
+        given(arg, "arg").ensureHasStructure({ pet: Foo });
+
+        assert.ok(true);
+    });
+
+    await test("should be fine given value is an instance of a subclass of the constructor schema value", () =>
+    {
+        const arg = { pet: new Bar() };
+
+        given(arg, "arg").ensureHasStructure({ pet: Foo });
+
+        assert.ok(true);
+    });
+
+    await test("should throw ArgumentException given value is not an instance of the constructor schema value", () =>
+    {
+        const arg = { pet: new Zax() };
+
+        assert.throws(() => given(arg, "arg").ensureHasStructure({ pet: Foo }),
+            (exp: Exception) => exp.name === "ArgumentException");
+    });
+
+    await test("should throw ArgumentException given value is a superclass of the constructor schema value", () =>
+    {
+        const arg = { pet: new Foo() };
+
+        assert.throws(() => given(arg, "arg").ensureHasStructure({ pet: Bar }),
+            (exp: Exception) => exp.name === "ArgumentException");
+    });
+
+    await test("should throw ArgumentException given value is a plain object for a constructor schema value", () =>
+    {
+        const arg = { pet: {} };
+
+        assert.throws(() => given(arg, "arg").ensureHasStructure({ pet: Foo }),
+            (exp: Exception) => exp.name === "ArgumentException");
+    });
+
+    await test("should be fine given optional constructor schema value is missing", () =>
+    {
+        const arg: { pet?: Foo; } = {};
+
+        given(arg, "arg").ensureHasStructure({ "pet?": Foo });
+
+        assert.ok(true);
+    });
+
+    await test("should be fine given typed array of constructor schema values", () =>
+    {
+        const arg = { pets: [new Foo(), new Bar()] };
+
+        given(arg, "arg").ensureHasStructure({ pets: [Foo] });
+
+        assert.ok(true);
+    });
+
+    await test("should throw ArgumentException given typed array contains a non-instance of the constructor schema value", () =>
+    {
+        const arg = { pets: [new Foo(), new Zax()] };
+
+        assert.throws(() => given(arg, "arg").ensureHasStructure({ pets: [Foo] }),
+            (exp: Exception) => exp.name === "ArgumentException");
     });
 });
