@@ -61,10 +61,12 @@ function given(arg, argName) {
  */
 function ensureExhaustiveCheck(value) {
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    throw new ApplicationException(`This should not happen; value: ${value !== null && value !== void 0 ? value : "NONE"}`);
+    throw new ApplicationException(`This should not happen; value: ${value ?? "NONE"}`);
 }
 export { given, ensureExhaustiveCheck };
 class EnsurerInternal {
+    _arg;
+    _argName;
     constructor(arg, argName) {
         this._arg = arg;
         this._argName = argName;
@@ -128,7 +130,7 @@ class EnsurerInternal {
             return this;
         if (this._arg === null || this._arg === undefined)
             return this;
-        if (typeof this._arg !== "object")
+        if (typeof this._arg !== "object" || Array.isArray(this._arg))
             throw new ArgumentException(this._argName, "must be object");
         return this;
     }
@@ -194,6 +196,8 @@ class EnsurerInternal {
             return this;
         if (this._arg === null || this._arg === undefined)
             return this;
+        if (typeof this._arg !== "object")
+            throw new ArgumentException(this._argName, `must be an object to validate structure, got '${typeof this._arg}'`);
         this._ensureHasStructure(this._arg, structure);
         return this;
     }
@@ -233,7 +237,7 @@ class EnsurerInternal {
         if (!func(this._arg)) {
             if (this._argName.toLowerCase() === "this")
                 throw new InvalidOperationException(reason != null && !reason.isEmptyOrWhiteSpace() ? reason.trim() : "current operation on instance");
-            throw reason != null && !reason.isEmptyOrWhiteSpace()
+            throw reason != null && reason.isNotEmptyOrWhiteSpace()
                 ? new ArgumentException(this._argName, reason.trim())
                 : new InvalidArgumentException(this._argName);
         }
@@ -268,7 +272,7 @@ class EnsurerInternal {
             if (typeInfo === null || typeInfo === undefined)
                 throw new ArgumentException("structure", `null type specification for key '${fullName}'`);
             if (typeof typeInfo !== "string" && typeof typeInfo !== "function" && typeof typeInfo !== "object")
-                throw new ArgumentException("structure", `invalid type specification '${typeInfo}' for key '${fullName}'`);
+                throw new ArgumentException("structure", `invalid type specification '${this._formatTypeInfo(typeInfo)}' for key '${fullName}'`);
             const value = arg[name];
             if (value === null || value === undefined) {
                 if (isOptional)
@@ -279,11 +283,11 @@ class EnsurerInternal {
             }
             if (typeof typeInfo === "string") {
                 if (typeInfo.isEmptyOrWhiteSpace())
-                    throw new ArgumentException("structure", `invalid type specification '${typeInfo}' for key '${fullName}'`);
+                    throw new ArgumentException("structure", `invalid type specification '${this._formatTypeInfo(typeInfo)}' for key '${fullName}'`);
                 const typeName = typeInfo.trim().toLowerCase();
                 const types = ["string", "boolean", "number", "function", "array", "object", "any"];
                 if (!types.contains(typeName))
-                    throw new ArgumentException("structure", `invalid type specification '${typeInfo}' for key '${fullName}'`);
+                    throw new ArgumentException("structure", `invalid type specification '${this._formatTypeInfo(typeInfo)}' for key '${fullName}'`);
                 if (typeName === "array") {
                     if (!Array.isArray(value))
                         throw new ArgumentException(this._argName, `invalid value of type '${typeof value}' for property '${fullName}' of type '${typeName}'`);
@@ -306,7 +310,7 @@ class EnsurerInternal {
                 if (typeInfo.isEmpty)
                     continue;
                 if (typeInfo.length > 1)
-                    throw new ArgumentException("structure", `invalid type specification '${typeInfo}' for key '${fullName}'`);
+                    throw new ArgumentException("structure", `invalid type specification '${this._formatTypeInfo(typeInfo)}' for key '${fullName}'`);
                 const arrayTypeInfo = typeInfo[0];
                 if (arrayTypeInfo === "any")
                     continue;
@@ -325,8 +329,25 @@ class EnsurerInternal {
                 this._ensureHasStructure(value, typeInfo, fullName);
                 continue;
             }
-            throw new ArgumentException("structure", `invalid type specification '${typeInfo}' for key '${fullName}'`);
+            throw new ArgumentException("structure", `invalid type specification '${this._formatTypeInfo(typeInfo)}' for key '${fullName}'`);
         }
+    }
+    _formatTypeInfo(typeInfo) {
+        if (typeInfo === null || typeInfo === undefined)
+            return String(typeInfo);
+        if (typeof typeInfo === "string")
+            return typeInfo;
+        if (typeof typeInfo === "function")
+            return typeInfo.getTypeName();
+        if (typeof typeInfo === "object") {
+            try {
+                return JSON.stringify(typeInfo);
+            }
+            catch {
+                return Object.prototype.toString.call(typeInfo);
+            }
+        }
+        return String(typeInfo);
     }
     // private _getTypeName(typeInfo: any, fullName: string): string
     // {
@@ -384,7 +405,7 @@ class EnsurerInternal {
         value = value.toString().trim();
         if (value.length === 0)
             return false;
-        const parsed = +value.toString().trim();
+        const parsed = +value;
         return !isNaN(parsed) && isFinite(parsed);
     }
     _getEnumValues(enumType) {

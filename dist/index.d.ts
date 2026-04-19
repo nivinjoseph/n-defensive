@@ -117,10 +117,11 @@ export interface FunctionEnsurer extends Ensurer<Function> {
     ensureIsFunction(when?: boolean | (() => boolean)): this | never;
 }
 type PrimitiveTypeInfo = "string" | "boolean" | "number" | "function" | "array" | "object" | "any";
-type ComplexTypeInfo = Record<string, PrimitiveTypeInfo | ArrayTypeInfo | NestedComplexTypeInfo>;
-interface NestedComplexTypeInfo extends Record<string, PrimitiveTypeInfo | ArrayTypeInfo | ComplexTypeInfo> {
+type ConstructorTypeInfo = new (...args: Array<any>) => object;
+type ComplexTypeInfo = Record<string, PrimitiveTypeInfo | ConstructorTypeInfo | ArrayTypeInfo | NestedComplexTypeInfo>;
+interface NestedComplexTypeInfo extends Record<string, PrimitiveTypeInfo | ConstructorTypeInfo | ArrayTypeInfo | ComplexTypeInfo> {
 }
-type ArrayTypeInfo = Array<PrimitiveTypeInfo | NestedComplexTypeInfo>;
+type ArrayTypeInfo = Array<PrimitiveTypeInfo | ConstructorTypeInfo | NestedComplexTypeInfo>;
 export type TypeStructure = NestedComplexTypeInfo;
 export interface ObjectEnsurer<T extends object> extends Ensurer<T> {
     /**
@@ -232,6 +233,16 @@ export interface ObjectEnsurer<T extends object> extends Ensurer<T> {
      * const shouldValidate = true;
      * given({ name: "John" }, "person")
      *   .ensureHasStructure(personStructure, () => shouldValidate); // only validates if shouldValidate is true
+     *
+     * // With a constructor — validates the value is an instance of the class (via instanceof)
+     * class Address { street!: string; city!: string; }
+     * const personWithAddressClass = {
+     *   name: "string",
+     *   address: Address,           // must be an Address instance
+     *   "pets?": [Animal]           // optional array of Animal instances
+     * };
+     * given({ name: "John", address: new Address() }, "person")
+     *   .ensureHasStructure(personWithAddressClass); // passes
      * ```
      */
     ensureHasStructure(structure: TypeStructure, when?: boolean | (() => boolean)): this | never;
